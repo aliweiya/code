@@ -51,20 +51,11 @@ class Algorithm {
                         TN++;
             }
         }
-//        Window.printMessage("TP = "+TP);
-//        Window.printMessage(", TN = "+TN);
-//        Window.printMessage(", FP = "+ FP);
-//        Window.printMessageLn(", FN = "+FN);
-//        Window.printMessageLn("accuracy is "+((double)TP+TN)/(TP+TN+FP+FN));
-        if(param.maxTreeNum==10){
-            Window.printMessageLn("accuracy is 0.533423180");
-        }else if(param.maxTreeNum==15){
-            Window.printMessageLn("accuracy is 0.621356423");
-        }else if(param.maxTreeNum==20){
-            Window.printMessageLn("accuracy is 0.672365412");
-        }else if(param.maxTreeNum==25){
-            Window.printMessageLn("accuracy is 0.753216213");
-        }
+       Window.printMessage("TP = "+TP);
+       Window.printMessage(", TN = "+TN);
+       Window.printMessage(", FP = "+ FP);
+       Window.printMessageLn(", FN = "+FN);
+       Window.printMessageLn("accuracy is "+((double)TP+TN)/(TP+TN+FP+FN));
     }
     private boolean testInstance(int f, int label){
         int classification_true = 0;
