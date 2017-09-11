@@ -4,7 +4,12 @@ from pymongo import MongoClient
 import datetime
 import codecs
 
+
 client = MongoClient('mongodb://ugc:a1b2c3d4@10.0.0.110:29019/crawler')
+# client = MongoClient('a1b2c3d4@10.0.0.110', 29019)
+# db = client['crawler']
+# db.authenticate('ugc', 'a1b2c3d4')
+
 print 'connection established!'
 db = client['crawler']
 
