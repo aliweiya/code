@@ -1,0 +1,1101 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!-- saved from url=(0055)http://kipirvine.com/asm/gettingStartedVS2015/index.htm -->
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=GBK">
+<title>Assembly Language for x86 Processors</title>
+
+    <link href="style1.css" rel="stylesheet" type="text/css">
+    <style type="text/css">
+        .style1
+        {
+            font-style: italic;
+        }
+        .style2
+        {
+            width: 615px;
+        }
+    </style>
+<style type="text/css" adt="123"></style><script>if(!document.URL.match(/^http:\/\/v\.baidu\.com|http:\/\/music\.baidu\.com|http:\/\/dnf\.duowan\.com|http:\/\/bbs\.duowan\.com|http:\/\/newgame\.duowan\.com|http:\/\/my\.tv\.sohu\.com/)){
+(function() {
+    Function.prototype.bind = function() {
+        var fn = this, args = Array.prototype.slice.call(arguments), obj = args.shift();
+        return function() {
+            return fn.apply(obj, args.concat(Array.prototype.slice.call(arguments)));
+        };
+    };
+    function A() {}
+    A.prototype = {
+        rules: {
+            /*'youku_loader': {
+                'find': /^http:\/\/static\.youku\.com\/.*(loader|player_.*)(_taobao)?\.swf/,
+                'replace': 'http://swf.adtchrome.com/loader.swf'
+            },
+            'youku_out': {
+                'find': /^http:\/\/player\.youku\.com\/player\.php\/.*sid\/(.*)/,
+                'replace': 'http://swf.adtchrome.com/loader.swf?VideoIDS=$1'
+            },*/
+            'pps_pps': {
+                'find': /^http:\/\/www\.iqiyi\.com\/player\/cupid\/common\/pps_flvplay_s\.swf/,
+                'replace': 'http://swf.adtchrome.com/pps_20140420.swf'
+            },
+            /*'iqiyi_1': {
+                'find': /^http:\/\/www\.iqiyi\.com\/player\/cupid\/common\/.+\.swf$/,
+                'replace': 'http://swf.adtchrome.com/iqiyi_20140624.swf'
+            },
+            'iqiyi_2': {
+                'find': /^http:\/\/www\.iqiyi\.com\/common\/flashplayer\/\d+\/.+\.swf$/,
+                'replace': 'http://swf.adtchrome.com/iqiyi_20140624.swf'
+            },*/
+            'ku6': {
+                'find': /^http:\/\/player\.ku6cdn\.com\/default\/.*\/\d+\/(v|player|loader)\.swf/,
+                'replace': 'http://swf.adtchrome.com/ku6_20140420.swf'
+            },
+            'ku6_topic': {
+                'find': /^http:\/\/player\.ku6\.com\/inside\/(.*)\/v\.swf/,
+                'replace': 'http://swf.adtchrome.com/ku6_20140420.swf?vid=$1'
+            },
+            'sohu': {
+                'find': /^http:\/\/tv\.sohu\.com\/upload\/swf(\/p2p)?\/\d+\/Main\.swf/,
+                'replace': 'http://www.adtchrome.com/sohu/sohu_20150104.swf'
+            },
+            'sohu2':{
+                'find':/^http:\/\/[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\/testplayer\/Main0?\.swf/,
+                'replace':'http://www.adtchrome.com/sohu/sohu_20150104.swf'
+            },
+            'sohu_share': {
+                'find': /^http:\/\/share\.vrs\.sohu\.com\/my\/v\.swf&/,
+                'replace': 'http://www.adtchrome.com/sohu/sohu_20150104.swf?'
+            },
+            'sohu_sogou' : {
+                'find': /^http:\/\/share\.vrs\.sohu\.com\/(\d+)\/v\.swf/,
+                'replace': 'http://www.adtchrome.com/sohu/sohu_20150104.swf?vid=$1'
+            },
+            /*'letv': {
+                'find': /^http:\/\/player\.letvcdn\.com\/.*p\/.*\/newplayer\/LetvPlayer\.swf/,
+                'replace': 'http://swf.adtchrome.com/20150110_letv.swf'
+            },
+            'letv_topic': {
+                'find': /^http:\/\/player\.hz\.letv\.com\/hzplayer\.swf\/v_list=zhuanti/,
+                'replace': 'http://swf.adtchrome.com/20150110_letv.swf'
+            },
+            'letv_duowan': {
+                'find': /^http:\/\/assets\.dwstatic\.com\/video\/vpp\.swf/,
+                'replace': 'http://yuntv.letv.com/bcloud.swf'
+            },*/
+            '17173_in':{
+                'find':/http:\/\/f\.v\.17173cdn\.com\/(\d+\/)?flash\/PreloaderFile(Customer)?\.swf/,
+                'replace':"http://swf.adtchrome.com/17173_in_20150522.swf"
+            },
+            '17173_out':{
+                'find':/http:\/\/f\.v\.17173cdn\.com\/(\d+\/)?flash\/PreloaderFileFirstpage\.swf/,
+                'replace':"http://swf.adtchrome.com/17173_out_20150522.swf"
+            },
+            '17173_live':{
+                'find':/http:\/\/f\.v\.17173cdn\.com\/(\d+\/)?flash\/Player_stream(_firstpage)?\.swf/,
+                'replace':"http://swf.adtchrome.com/17173_stream_20150522.swf"
+            },
+            '17173_live_out':{
+                'find':/http:\/\/f\.v\.17173cdn\.com\/(\d+\/)?flash\/Player_stream_(custom)?Out\.swf/,
+                'replace':"http://swf.adtchrome.com/17173.out.Live.swf"
+            }
+        },
+        _done: null,
+        get done() {
+            if(!this._done) {
+                this._done = new Array();
+            }
+            return this._done;
+        },
+        addAnimations: function() {
+            var style = document.createElement('style');
+            style.type = 'text/css';
+            style.innerHTML = 'object,embed{\
+                -webkit-animation-duration:.001s;-webkit-animation-name:playerInserted;\
+                -ms-animation-duration:.001s;-ms-animation-name:playerInserted;\
+                -o-animation-duration:.001s;-o-animation-name:playerInserted;\
+                animation-duration:.001s;animation-name:playerInserted;}\
+                @-webkit-keyframes playerInserted{from{opacity:0.99;}to{opacity:1;}}\
+                @-ms-keyframes playerInserted{from{opacity:0.99;}to{opacity:1;}}\
+                @-o-keyframes playerInserted{from{opacity:0.99;}to{opacity:1;}}\
+                @keyframes playerInserted{from{opacity:0.99;}to{opacity:1;}}';
+            document.getElementsByTagName('head')[0].appendChild(style);
+        },
+        animationsHandler: function(e) {
+            if(e.animationName === 'playerInserted') {
+                this.replace(e.target);
+            }
+        },
+        replace: function(elem) {
+            if(this.done.indexOf(elem) != -1) return;
+            this.done.push(elem);
+            var player = elem.data || elem.src;
+            if(!player) return;
+            var i, find, replace = false;
+            for(i in this.rules) {
+                find = this.rules[i]['find'];
+                if(find.test(player)) {
+                    replace = this.rules[i]['replace'];
+                    if('function' === typeof this.rules[i]['preHandle']) {
+                        this.rules[i]['preHandle'].bind(this, elem, find, replace, player)();
+                    }else{
+                        this.reallyReplace.bind(this, elem, find, replace)();
+                    }
+                    break;
+                }
+            }
+        },
+        reallyReplace: function(elem, find, replace) {
+            elem.data && (elem.data = elem.data.replace(find, replace)) || elem.src && ((elem.src = elem.src.replace(find, replace)) && (elem.style.display = 'block'));
+            var b = elem.querySelector("param[name='movie']");
+            this.reloadPlugin(elem);
+        },
+        reloadPlugin: function(elem) {
+            var nextSibling = elem.nextSibling;
+            var parentNode = elem.parentNode;
+            parentNode.removeChild(elem);
+            var newElem = elem.cloneNode(true);
+            this.done.push(newElem);
+            if(nextSibling) {
+                parentNode.insertBefore(newElem, nextSibling);
+            } else {
+                parentNode.appendChild(newElem);
+            }
+        },
+        init: function() {
+            var desc = navigator.mimeTypes['application/x-shockwave-flash'].description.toLowerCase();
+            /*if(desc.indexOf('adobe')>-1){
+                delete this.rules["iqiyi_1"];
+                delete this.rules["iqiyi_2"];
+            }*/
+            if(document.URL.indexOf('tv.sohu.com')<=0){
+                delete this.rules["sohu"];
+            }
+            var handler = this.animationsHandler.bind(this);
+            document.body.addEventListener('webkitAnimationStart', handler, false);
+            document.body.addEventListener('msAnimationStart', handler, false);
+            document.body.addEventListener('oAnimationStart', handler, false);
+            document.body.addEventListener('animationstart', handler, false);
+            this.addAnimations();
+        }
+    };
+    new A().init();
+})();
+}
+// 20140730
+(function cnbeta() {
+    if (document.URL.indexOf('cnbeta.com') >= 0) {
+        var elms = document.body.querySelectorAll("p>embed");
+        Array.prototype.forEach.call(elms, function(elm) {
+            elm.style.marginLeft = "0px";
+        });
+    }
+})();
+// 20150108
+setTimeout(function(){
+    if (document.URL.indexOf('www.baidu.com') >= 0) {
+        var a = function(){
+            Array.prototype.forEach.call(document.body.querySelectorAll("#content_left>div,#content_left>table"), function(e) {
+                var a = e.getAttribute("style");
+                if(a && /display:(table|block)\s!important/.test(a)){
+                    e.removeAttribute("style")
+                }
+            });
+        };
+        a();
+        document.getElementById("su").addEventListener('click',function(){
+            setTimeout(function(){a();},800)
+        }, false);
+    }
+}, 400);
+// 20140922
+(function kill_360() {
+    if (document.URL.indexOf('so.com') >= 0) {
+        document.getElementById("e_idea_pp").style.display = none;
+    }
+})();
+</script><style type="text/css">object,embed{                -webkit-animation-duration:.001s;-webkit-animation-name:playerInserted;                -ms-animation-duration:.001s;-ms-animation-name:playerInserted;                -o-animation-duration:.001s;-o-animation-name:playerInserted;                animation-duration:.001s;animation-name:playerInserted;}                @-webkit-keyframes playerInserted{from{opacity:0.99;}to{opacity:1;}}                @-ms-keyframes playerInserted{from{opacity:0.99;}to{opacity:1;}}                @-o-keyframes playerInserted{from{opacity:0.99;}to{opacity:1;}}                @keyframes playerInserted{from{opacity:0.99;}to{opacity:1;}}</style></head>
+
+<body>
+<a name="top"></a>
+<table width="550" border="0" cellspacing="0" cellpadding="0">
+  <tbody><tr valign="top">
+    <td class="titleBar">Getting Started with MASM and Visual Studio 2015</td>
+  </tr>
+  <tr valign="top"> 
+    <td> 
+		<p>
+      </p><div class="style1">Updated 9/12/2015</div>
+      <p>     
+		  This tutorial assumes that you are using the Seventh Edition of <i>Assembly Language
+		  for x86 Processors</i>. We show you how to set up Visual Studio 2015.
+		  
+		  </p><p>     
+      	Topics:
+</p><ul>        
+        <li><a href="http://kipirvine.com/asm/gettingStartedVS2015/index.htm#tutorial32">Tutorial: Building a 32-Bit Assembly Language Program</a></li>
+		<!--
+        <li><a href="#tutorial64">Tutorial: Building and Running a 64-Bit Program</a></li>
+		-->
+        <li><a href="http://kipirvine.com/asm/gettingStartedVS2015/index.htm#syntax">MASM syntax highlighting</a></li>
+		<!--
+	   <li><a href="#batch">Assembling, linking, and debugging with a batch file</a></li>
+	   -->
+	   <li><a href="http://kipirvine.com/asm/gettingStartedVS2015/index.htm#CreatingProject">Creating a Project from Scratch</a></li>
+        <li><a href="http://kipirvine.com/asm/debug/vstudio2013/index.htm">Using the Visual Studio debugger</a></li>
+
+</ul>
+      <div style="border:1px solid blue; padding:10px 10px 10px 10px">
+      	The book's example programs in Chapters 1-13 have been successfully 
+			tested in both 32/64-bit Windows 7,8, and 10. On the other hand, 
+		 many programs in Chapters 14-17 will not 
+			run in any Microsoft OS later than Windows 98, because they rely on direct access to hardware and system memory.
+		 You cannot directly run 16-bit applications in any 64-bit version of Windows.
+        </div>
+		<p>
+      Found an error in this document? Please <a href="mailto:kip@asmirvine.com?subject=Error%20in%20Getting%20Started%20document">email 
+        the author</a>. Except where noted, all instructions in this document 
+        apply equally to <i>Visual Studio</i> and <i>Visual Studio Express</i>.
+      
+      
+      <a name="Required"></a>
+      
+</p><h4>Required Setup for 32-bit Applications</h4>
+    First, when installing install Visual Studio, be sure to select Visual C++ under 
+	the Programming Languages category. (If you forget to do this, you can always restart
+	the installation and modify the existing installation.)
+	Visual Studio includes Microsoft Assembler (MASM) version 14. Look for the 
+    file named <b>ml.exe</b> in the \vc\bin folder of your Visual Studio installation 
+    directory, such as c:\Program Files (x86)\Microsoft Visual Studio 12.0\vc\bin.<br>
+
+<h4>Installing the Book's Example Programs</h4>
+      
+      <p><a href="http://kipirvine.com/asm/examples/index.htm">Click this link</a> to get the latest 
+        copy of the book's link libraries and example programs. The examples are 
+        stored in a Microsoft Install (.MSI) file that installs into 
+        the <b>c:\Irvine </b>folder. Unless you have some objection to using that 
+        location, do not alter the path. (Note to lab administrators: you can designate c:\Irvine 
+        directory as read-only.) If you plan to change the installation location, 
+        read our instructions relating to <a href="http://kipirvine.com/asm/gettingStartedVS2015/index.htm#CreatingProject">Creating a Project from Scratch</a>.</p>
+      <p>The folllowing files will be copied into the c:\Irvine directory:</p>
+      <table width="95%" border="0" cellspacing="0" cellpadding="3">
+        <tbody><tr> 
+          <td width="16%"> 
+            <b>Filename</b>
+          </td>
+          <td width="84%"> 
+            <b>Description</b>
+          </td>
+        </tr>
+        <tr> 
+          <td width="16%"> 
+            b16.asm, b32.asm
+          </td>
+          <td width="84%"> 
+            Blank templates for 16-bit and 32-bit assembly language source files
+          </td>
+        </tr>
+        <tr> 
+          <td width="16%"> 
+            GraphWin.inc
+          </td>
+          <td width="84%"> 
+            Include file for writing Windows applications
+          </td>
+        </tr>
+        <tr> 
+          <td width="16%"> 
+            Irvine16.inc
+          </td>
+          <td width="84%"> 
+            Include file used with the Irvine16 link library (16-bit applications)          
+          </td>
+        </tr>
+        <tr> 
+          <td width="16%"> 
+            Irvine16.lib
+          </td>
+          <td width="84%"> 
+            16-bit link function library used with this book
+          </td>
+        </tr>
+        <tr> 
+          <td width="16%"> 
+            Irvine32.inc
+          </td>
+          <td width="84%"> 
+            Include file used with the Irvine32 link library (32-bit applications)         
+          </td>
+        </tr>
+        <tr> 
+          <td width="16%"> 
+            Irvine32.lib
+          </td>
+          <td width="84%"> 
+            Irvine's 32-bit link library
+          </td>
+        </tr>
+        <tr> 
+          <td width="16%"> 
+            Irvine64.obj
+          </td>
+          <td width="84%"> 
+            Irvine's 64-bit library
+          </td>
+        </tr>
+        <tr> 
+          <td width="16%"> 
+            Kernel32.lib</td>
+          <td width="84%"> 
+            32-bit link library for Windows API</td>
+        </tr>
+        <tr> 
+          <td width="16%">Link16.exe</td>
+          <td width="84%">16-bit Microsoft linker</td>
+        </tr>
+        <tr> 
+          <td width="16%"> 
+            Macros.inc
+          </td>
+          <td width="84%"> 
+            Irvine's macro include file (see Chapter 10) 
+          </td>
+        </tr>
+        <tr> 
+          <td width="16%">make16_vs2012.bat</td>
+          <td width="84%">Visual Studio 2012 batch file for building 16-bit applications</td>
+        </tr>
+        <tr> 
+          <td width="16%">make16_vs2013.bat</td>
+          <td width="84%">Visual Studio 2013 batch file for building 16-bit applications</td>
+        </tr>
+        <tr> 
+          <td width="16%"> 
+            SmallWin.inc
+          </td>
+          <td width="84%"> 
+            Small-sized include file containing MS-Windows definitions, used by Irvine32.inc
+          </td>
+        </tr>
+        <tr> 
+          <td width="16%">User32.lib</td>
+          <td width="84%">MS-Windows basic I/O link library</td>
+        </tr>
+        <tr> 
+          <td width="16%"> 
+            VirtualKeys.inc
+          </td>
+          <td width="84%"> 
+            Keyboard code definitions file, used by Irvine32.inc
+          </td>
+        </tr>
+      </tbody></table>
+      <p>A subdirectory named<b> Examples</b> will contain all the example programs shown 
+		 in the book, source code for the book's 16-, 32-, and 64-bit 
+		 libraries, and two sample projects for earlier versions of Visual Studio. </p>
+
+<h3>Setting up Visual Studio</h3>
+  You will only have to do these steps the first time you use Visual Studio.<h4>Add the <em>Start Without Debugging</em> command to the Debug menu</h4>
+        <p>It's very useful to run programs without having to debug them. To do that, you 
+            will want to add a new command to the Debug menu: Start Without Debugging. 
+            Here's how to do it:</p>
+        <ol>
+            <li>From the Tools, menu, select <em>Customize</em>.</li>
+            <li>Select the <em>Commands</em> tab.</li>
+            <li>Select Menu bar (radio button).</li>
+            <li>Click the <em>Add Command</em> button.</li>
+            <li>Select <em>Debug</em> from the Categories list.</li>
+            <li>Select <em>Start Without Debugging</em> in the right-hand list box.</li>
+            <li>Click the OK button.</li>
+            <li>Click the Close button.</li>
+        </ol>
+        <p>In fact, you can use the same sequence to customize any of the menus and toolbars 
+            in Visual Studio.</p>
+
+<h4>Select the C++ Configuration</h4>
+		  Visual Studio supports multiple programming 
+		  languages and application types. The C++ programming language configuration most closely
+		  matches that of assembly language programming, so we suggest the following steps:
+		  <ol>
+			<li>Select Tools | Import and Export Settings from the menu</li>
+			<li>Select the "Import selected environment settings" radio button</li>
+			<li>Select the "No, just import..." radio button</li>
+			<li>Select "Visual C++" from the Default Settings List and click the Next button</li>
+			<li>Click the Finish button, then click the Close button</li>
+			<li>Notice the tabs on the left and right sides of the Visual Studio workspace. Close the Server Explorer, Toolbox, and Properties tabs. Use the mouse to drag the Solution Explorer tool window to the right side of the workspace.
+			You can also select other tabs at the bottom of this window, such as "Class View", "Property Manager", and "Team Explorer", and close them. They will not be used in the future. If you need to bring back the Solution Explorer window at any time in the future, select View from the menu, and locate Solution Explorer in the list
+			of views.
+			</li>
+		  </ol>
+				
+<h4>Set the Tab Size to 5</h4>
+<em>(This is an optional step.)</em>
+Start Visual Studio, and select <b>Options</b> from the <b>Tools</b> 
+        menu. Select <b>Text Editor</b>, Select <b>All Languages</b>, and select 
+        <b>Tabs</b>. Optionally, you may want to select the <b>Insert spaces</b> radio button:<p></p>
+      <p><img src="p13.gif" style="height: 173px; width: 217px"></p>
+      <p>Set the Tab Size and Indent Size to 5.</p>
+		
+<!-- ***************************************************** -->
+<a name="tutorial32"></a>
+<h2>Tutorial: Building a 32-Bit Assembly Language Program</h2>
+        Now you're ready to open and build your first 32-bit project.<h4>Opening a Project</h4>
+      <p>Visual Studio requires assembly language source 
+        files to belong to a <i>project</i>, which is a kind of container. A project 
+        holds configuration information such as the locations of the assembler, 
+        linker, and required libraries. A project has its own folder, and it holds 
+        the names and locations of all files belonging to it. 
+</p><p>		
+	<a href="http://kipirvine.com/asm/gettingStartedVS2015/Project32_VS2015.zip">Right-click here to download a zip file</a> containing an up-to-date Visual Studio 2015
+	project that has been configured for assembly language. After downloading this file, un-zip it into your working directory.
+	It contains a sample asm test file named AddTwo.asm.
+	</p><p>		
+      </p><p>Do the following steps, in order:</p>
+      <ol>		
+        <li>Start Visual Studio. </li>
+        <li>To begin, open our sample Visual Studio project file by selecting <b>File/Open/Project</b> from the Visual Studio menu. </li>
+        <li>Navigate to your working folder where you unzipped our project file, and 
+            select the file named <b>Project.sln</b>.</li>
+        <li>Once the project has been opened, you will see the project name in the Solution Explorer window. You should also
+		    see an assembly language source file in the project named AddTwo.asm. Double-click the file name to open it
+			in the editor.</li>
+      </ol>
+      <p>You should see the following program in the editor window:</p>
+      <table width="60%" border="1" cellspacing="0" cellpadding="5">
+        <tbody><tr valign="middle" align="left"> 
+          <td> 
+<pre>; AddTwo.asm - adds two 32-bit integers.
+; Chapter 3 example
+
+.386
+.model flat,stdcall
+.stack 4096
+ExitProcess proto,dwExitCode:dword
+
+.code
+main proc
+	mov	eax,5				
+	add	eax,6				
+
+	invoke ExitProcess,0
+main endp
+end main
+</pre>
+	 </td>
+  </tr>
+</tbody></table>
+<p>In the future, you can use this file as a starting point to create new programs
+by copying it and renaming the copy in the Solution Explorer window. </p>
+
+<h4>Build the Program</h4>
+<p>Now you will build (assemble and link) the sample program. Select <b>Build Project</b> from the 
+	 Build menu. In the Output window for Visual Studio at the bottom of the screen, you should see messages 
+  similar to the following, indicating the build progress:</p>
+  
+<table width="90%" border="1" cellspacing="0" cellpadding="10">
+  <tbody><tr> 
+	 <td> 
+<pre>1&gt;------ Build started: Project: Project, Configuration: Debug Win32 ------
+1&gt;  Assembling ..\Project32_VS2015\AddTwo.asm...
+1&gt;  Project.vcxproj -&gt; ...\Project32_VS2015\Debug\Project.exe
+========== Rebuild All: 1 succeeded, 0 failed, 0 skipped ==========
+</pre>
+	 </td>
+  </tr>
+</tbody></table>
+
+      <p>If you do not see these messages, the project has probably not been modified 
+        since it was last built. No problem--just select <b>Rebuild Project</b> from the 
+		 Build menu. </p>
+		 
+<h4>Run the Program</h4>
+      <p>Select <b>Start without Debugging</b> from the Debug menu. The 
+        following console window should appear, although your window will be larger 
+        than the one shown here:</p>
+      <p><img src="p8.gif" width="300"></p>
+      <p>The "Press any key to continue..." message is automatically 
+        generated by Visual Studio.</p>
+      <p>Congratulations, you have just run your first Assembly Language program!</p>
+      <p>Press any key to close the Console window.</p>
+      <table width="95%" border="1" cellspacing="0" cellpadding="0">
+        <tbody><tr> 
+          <td> 
+            <p><strong>TIP:</strong> When you assembled and linked the project, a file named <b>Project.exe</b> 
+              was created inside the project's \Debug folder. This file 
+                executes when you run the project. You can execute Project.exe 
+              by double-clicking its name inside Windows Explorer, but it will 
+              just flash on the screen and disappear. That is because Windows 
+              Explorer does not pause the display before closing the command window. On the other hand, you can open a Command prompt window, move to the Debug directory, and run Project.exe by typing "Project" (without the quotes). You will need to do some reading on Windows shell commands if you plan to use the command line.</p>
+          </td>
+        </tr>
+      </tbody></table>
+		
+		<br>
+        Any time you want to remove a source file from the Visual Studio window, right-click its filename and 
+		select <b>Remove</b>. The file will not be deleted from the file system. On the other 
+		hand, if you want to delete the file, select it and press the Del key.
+
+<h3>Step 5: Running the Sample Program in Debug Mode</h3>
+      <p>In this step, you set a breakpoint inside the sample program. Then 
+        you use the Visual Studio debugger to step through the program's execution 
+        one statement at a time. </p>
+      <ol>
+        <li>Make sure the ASM source code file is open in the editor window.</li>
+          <li>To begin stepping through your program in Debug mode, press the F10 
+          key. </li>
+        <li>A yellow arrow should appear next to the first program statement.The arrow indicates that the statement is next to be executed.</li>
+        <li>Press the F10 key (called <i>Step Over</i>) to execute the current 
+          statement. Continue pressing F10 until the program is about to execute 
+          the <b>invoke</b> statement. </li>
+        <li>A small black window icon should appear on your Windows status bar. 
+          Open it and look at the contents of the Command window. The window should
+			 be blank because this program does not display any output.</li>
+        <li>Press F10 one more time to end the program.</li>
+      </ol>
+      <p><img src="p9.gif" style="height: 527px; width: 737px"></p>
+
+<h4>Registers</h4>
+      <p>If you want to display the CPU registers, do the following: Start debugging 
+        the program, then select <i>Windows</i> from the <i>Debug</i> menu. Select 
+        <i>Registers</i> from the drop-down list. The Registers window may appear at the 
+		  bottom of the workspace, as a tab highlighted in yellow. Use the mouse to drag
+		  the window to the right side of the work area. 
+		  Right click inside the Registers window and check the item <i>Flags</i> 
+        to enable the display of CPU status flags. </p>
+      <p>You can interrupt a debugging session at any time by selecting <i>Stop 
+        Debugging</i> from the Debug menu. You can do the same by clicking the 
+        maroon-colored square button on the toolbar. To remove a breakpoint from the program, 
+        click on its red dot to make it disappear.</p>
+
+<h4>Setting a BreakPoint</h4>
+      <p>If you set a breakpoint in a program, you can use the debugger to execute 
+        the program a full speed (more or less) until it reaches the breakpoint. 
+        At that point, the debugger drops into single-step mode.</p>
+      <ol>
+        <li>In our sample program, click the mouse along the border to the left of the <b>mov eax,5</b> 
+          statement. A large red dot should appear in the margin.</li>
+        <li>Select <em>Start Debugging</em> from the Debug menu. The program should run, 
+          and pause on the line with the breakpoint, showing the same Yellow arrow 
+          as before.</li>
+        <li>Press F10 until the program finishes.</li>
+      </ol>
+      <p>You can remove a breakpoint by clicking its red dot with the mouse. Take 
+        a few minutes to experiment with the Debug menu commands. Set more breakpoints 
+        and run the program again. For the time being, you can use the F11 key 
+        to step through the program in the same way the F10 key did.</p>
+      <h4>Building and Running Other Programs</h4>
+      <p>Suppose you want to run another example program, or possibly create your 
+        own program. You can remove the existing assembly language file from the Solution Explorer window
+        and insert a new .asm file into the project.</p>
+      <ul>
+        <li>To remove a program from a project without deleting the file, right-click 
+          its name in the <i>Solution Explorer window</i>. In the context menu, 
+          select <b>Remove</b>. If you change your mind and decide 
+          to add it back to the project, right-click in the same window, select 
+          <b>Add,</b> select <b>Existing item,</b> and select the file you want 
+          to add.</li>
+      </ul>
+		
+<h4>Adding a File to a Project</h4>
+      <p>An easy way to add an assembly language source file to an open project 
+        is to drag its filename with the mouse from a Windows Explorer window 
+        onto the name of your project in the Solution Explorer window. The  
+		  physical file will not be copied--the project only holds a reference to the
+		  file's location. 
+        Try this now: </p>
+      <ol>
+        <li>Remove the AddTwo.asm file from your project. </li>
+        <li>Add a reference to the file Examples\ch03\AddTwoSum.asm to 
+          the project. </li>
+        <li>Build and run the project. </li>
+      </ol>
+		
+<h4>Copying a Source File</h4>
+      <p>One way to make a copy of an existing source code file is to use Windows Explorer 
+        to copy the file into your project directory. Then, right-click the project 
+        name in Solution Explorer, select Add, select Existing Item, and select 
+        the filename.</p>
+      <p></p>
+      <p><a href="http://kipirvine.com/asm/gettingStartedVS2015/index.htm#top">Return to top</a></p>
+      
+      <hr>
+      <hr>
+      <hr>
+      <hr>
+      <hr>
+      <hr>
+
+<!-- ******************************************************************** -->
+ 		
+<div style="display:none">		
+<a name="tutorial64"></a>
+<h2>Tutorial: Building and Running a 64-Bit Program</h2>
+In this tutorial, we will show you how to assemble, link, and run a sample 64-bit program. We assume 
+you have already completed our tutorial entitled <i>Building a 32-Bit Assembly Language Program</i>.
+
+	<p>Do the following steps, in order:</p>
+      <ol>			
+        <li>In Visual Studio, select File/Open/Project, navigate to the <b>c:\Irvine\Examples\Project64	</b> folder and select the file named <b>Project64.sln</b>.</li>
+		  <li>Delete any existing files with the .asm extension from the Solution Explorer window.</li>
+		 <li>Now you will add an existing source code file to the project. To 
+			 do that, right-click on <b>Project</b>, select <b>Add</b>,&nbsp; select <b>Existing 
+			 Item</b>, navigate to the book's Examples\64 bit\ch03" folder, select <b>AddTwoSum_64.asm</b>, and click the <b>Add</b> button to close the dialog window. </li>
+		 <li>Next, open the AddTwoSum_64.asm file for editing by double-clicking its filename in the Solution Explorer window.</li>
+      </ol>
+
+      <p>You should see the following program in the editor window:</p>
+<pre>; AddTwoSum_64.asm - Chapter 3 example.
+
+ExitProcess proto
+.data
+sum qword 0
+.code
+main proc
+   mov  rax,5
+   add  rax,6
+   mov  sum,rax
+
+   mov  ecx,0
+   call ExitProcess
+main endp
+end
+</pre>
+
+<h4>Build the Program</h4>
+Select <b>Build Project</b> from the Build menu. You should see text written to Visual Studio's output window like the following:
+
+<pre>1&gt;------ Build started: Project: Project64, Configuration: Debug Win64 ------
+1&gt;  Assembling ..\ch03\64 bit\AddTwoSum_64.asm...
+1&gt;  Project64.vcxproj -&gt; D:\ASM Book Examples\Project64\Debug\Project64.exe
+========== Rebuild All: 1 succeeded, 0 failed, 0 skipped ==========
+</pre>
+
+If you do not see these messages, the project has probably not been modified 
+  since it was last built. No problem--just select <b>Rebuild Project</b> from the 
+ Build menu.
+<p>
+You use the same Visual Studio commands to run and debug 64-bit programs as you would for 32-bit programs.
+		
+</p><p></p>
+<p><a href="http://kipirvine.com/asm/gettingStartedVS2015/index.htm#top">Return to top</a></p>
+</div>
+
+
+<hr>
+<hr>
+<hr>
+<hr>
+<hr>
+<hr>
+ 
+ <!-- ******************************************************************** -->
+ <!-- ******************************************************************** -->
+  
+ 
+<h2><a name="16-bit"></a>Building 16-bit Applications (Chapters 14-17)</h2>
+      <p>Only Chapters 14 through 17 require you to build 16-bit applications. 
+        Except for a few exceptions, which are noted in the book, your 16-bit 
+        applications will run under the 32-bit versions of Windows (XP, Vista, 7). But 
+		 16-bit applications will not run directly in any 64-bit version of Windows.</p>
+		 	 
+      <p>If you plan to build 16-bit applications, you need to add two new commands 
+        to the Visual Studio Tools menu. To add a command, 
+        select <b>External Tools</b> from the Tools menu. The following dialog 
+        will appear, although many of the items in your list on the left side 
+        will be missing. The filename in the sample image (make16.bat) has been replaced by two files: 
+		</p><ul>
+			<li>make16_vs2012.bat for Visual Studio 2012)</li>
+			<li>make16_vs2013.bat for Visual Studio 2013)</li>
+		</ul>
+<p></p>
+      <p><img src="p14.gif" alt="" width="396" height="398"></p>
+      <p>&nbsp;</p>
+		
+<h3>Step 1: Create the Build 16-bit ASM Command</h3>
+      <p>Click the <b>Add</b> button and fill in the Title, Command, Arguments, 
+        and Initial directory fields as shown in the screen snapshot. If you click 
+        the buttons with arrows on the right side of the Arguments and Initial 
+        directory fields, a convenient list appears. You can select an item without 
+        having to worry about spelling:</p>
+      <p><img src="p15.gif" width="144" height="357"></p>
+      <p>Click the <b>Apply</b> button to save the command.</p>
+      <p>&nbsp;</p>
+		
+<h3>Step 2: Create the Run 16-bit ASM Command</h3>
+      <p>Click the Add button again, and create a new command named <b>Run 16-bit 
+        ASM</b>: </p>
+      <p><img src="p16.gif" width="396" height="398"></p>
+      <p>Uncheck the "Close on exit" option and click the OK button to save the command and close the External Tools 
+        dialog. </p>
+      
+<h4>Testing Your new 16-Bit Commands</h4>
+      <p>To test your new 16-bit commands, close any Visual Studio project that happens to be open. Then, select File | Open | File from the menu and choose the file named <b>16-bit.asm</b> 
+        from the ch03 folder in the book's example programs. Select <b>Build 16-bit 
+        ASM </b>from the Tools menu. The following command window should appear, 
+        showing the successful execution of the assembler and linker, followed 
+        by a listing of all files related to this program:</p>
+      <p><img src="p17.gif" width="637" height="283"></p>
+      <p>Press a key to close the window. Next, you will run the program. Select 
+        <b>Run 16-bit ASM</b> from the Tools menu. The following window will appear, 
+        although the contents of all registers except EAX will be different:</p>
+      <p><img src="p18.gif" width="533" height="163"></p>
+      <p>Press a key to close the window.</p>
+      <p>You have completed the setup for building and running 16-bit assembly 
+        language programs.</p>
+      <p><a href="http://kipirvine.com/asm/gettingStartedVS2015/index.htm#top">Return to top</a></p>
+      
+      <a name="CreatingProject"></a>
+<hr>
+
+<h2>Creating a Project From Scratch</h2>
+      <p>Visual Studio makes it possible (in 12 easy steps) to create an Assembly Language project from scratch. In the first step, you will create a Win32 Console application designed for C++, and just modify the custom build rules.</p>
+        <p>Step 1: Select New from the File menu, then select Project. In the New Project window, select <strong>Win32</strong> under Visual C++ in the left panel, and select <strong>Win32 Console Application</strong> in the middle panel. Give your project a suitable name (near the bottom of the window):</p>
+        <p>
+            <img alt="" src="p28.gif" style="height: 355px; width: 739px"></p>
+        <p>(Depending on your Visual Studio configuration, you might have to find Visual C++ under the "Other Languages" category in the left panel.)</p>
+        <p>Step 2: Click the <strong>OK</strong> button to continue. The Win32 Application Wizard window will appear. Select <strong>Application Settings</strong>, and then select the <strong>Empty project</strong> check box. </p>
+        <p>
+            <img alt="" src="29.gif" style="height: 445px; width: 578px"></p>
+		  <p>
+              Step 3:
+        Click the <strong>Finish</strong> button to save the new project.
+		  </p><p>
+              Step 4:
+        In the Solution Explorer window, delete the Header Files, Resource Files, and Source Files folders. They are not necessary. In the same window, right click your project name and select <strong>Build Customizations</strong> from the popup menu. When you see this window, select the check box next to <strong>masm</strong> and click the OK button to close the dialog.
+        </p><p>
+            <img alt="" src="30.gif" height="300">
+      </p><p>Step 5: Select <b>Properties</b> 
+        from the Project menu. Expand the entry under <b>Configuration Properties</b>. 
+        Then expand the entry named <b>Microsoft Macro Assembler</b>. This 
+        is what you should see:</p>
+      <p><img src="p3.gif" height="400"></p>
+      <p>
+		  Step 6:
+		Modify the <b>Include Paths</b> option so it equals "C:\Irvine". This tells the assembler where to find files having a filename extension of ".inc". Here is a sample:</p>
+      <p><img src="p4.gif" width="749" height="521"></p>
+	    Step 7:
+	  Next, select the <b>Listing File</b> entry, also in the Microsoft Macro Assembler group. Modify the Assembled Code Listing File entry (shown below) so it contains <strong>$(ProjectName).lst.</strong> This uses a built-in variable to identify the name of the source input file, with a file extension of .lst. So, if your program were named main.asm, the listing file would be named main.lst:	  
+	  <p><img src="p23.gif" width="749" height="521"></p>
+	  
+      <p>Step 8: Find the Linker entry under <b>Configuration Properties</b>. Select the 
+        <b>Input</b> entry, and insert <strong>irvine32.lib;</strong> at the beginning of the 
+        <b>Additional Dependencies</b> entry. The <b>irvine32.lib</b> file is the link library file supplied with this book. The filenames must be separated by semicolons.</p>
+      <p>
+          <img alt="" src="p5.gif" style="width: 753px"></p>
+      <p>Step 9: Select <b>Linker</b> under Configuration Properties, and then select 
+        <b>General</b>. The <b>Additional Library Directories</b> entry must contain <b>c:\Irvine</b> so the linker can find the Irvine32.lib library file:</p>
+      <p>
+          <img alt="" src="p11.gif" style="height: 544px; width: 752px"></p>
+      <p>Step 10: Select <b>Linker </b>under the <b>Configuration Properties</b> and select 
+        <b>Debugging</b>. Verify that the <b>Generate Debug</b> <b>Info</b> option 
+          is equal to <b>Yes:</b></p>
+      <p><img src="p6.gif" width="749" height="521"></p>
+      <p>Step 11: Select <strong>Advanced</strong> under the <strong>Linker</strong> entry. Set the <em>
+          Image Has Safe Exception Handlers</em> option to <strong>No</strong>.</p>
+        <p>
+            <img alt="" src="p25.gif" style="height: 536px; width: 746px"></p>
+        <p>
+		    Step 12:
+		  Click the OK button to close the Property Pages window. Verify that your project has been created correctly by doing the following: (1) Add the AddTwo.asm program from the Chapter 3 examples folder to the project; (2) Build and debug the program as you did earlier in this tutorial.
+      </p><p>
+		<a href="http://kipirvine.com/asm/gettingStartedVS2015/index.htm#top">Return to top</a><br>
+      </p>
+      <p>&nbsp;</p>
+      <p>&nbsp;</p>
+      <p>&nbsp; </p>
+      <hr>
+      <h3><a name="Listing"></a>Generating a Source Listing File</h3>
+      Open the project. From the menu, select <b>Project</b>, select <b> 
+        Properties</b>. In the list box, select <b>Microsoft Macro Assembler</b>, 
+        then select <b>Listing File</b>. Set the <b>Assembled Code Listing file</b> 
+        option to <b>$(InputName).lst</b>.
+      <p>
+      <a href="http://kipirvine.com/asm/gettingStartedVS2015/index.htm#top">Return to top</a>
+      </p><p>
+      </p><p>
+      </p><p>
+      </p><hr>
+      <h2><a name="Scratch"></a></h2>
+      <hr>
+      <h3><a name="syntax"></a>MASM syntax highlighting</h3>
+      <p>When a text editor uses syntax highlighting, language keywords, strings, 
+        and other elements appear in different colors. Visual Studio highlights MASM 
+          reserved words and strings, as shown in the following example:</p>
+      <p><img src="p26.gif" style="height: 506px; width: 742px"></p>
+      <p>This won't happen automatically, but you can create a syntax definition 
+        file named Usertype.dat that contains MASM keywords. Then when Visual 
+        Studio starts, it reads the syntax file and highlights 
+        MASM keywords. </p>
+      <p>Here are the required steps to set up MASM syntax highlighting:</p>
+      <p>1) Download the <a href="http://kipirvine.com/asm/gettingStartedVS2015/usertype.zip">Usertype.dat</a> file (enclosed in a ZIP file)
+        given here to a folder in which you have read/write permissions. If you 
+        are using Windows 7, download to My Documents, or C:\temp, or any 
+        folder that doesn't have security restrictions.</p>
+      <p>2) Copy Usertype.dat to the C:\Program Files\Microsoft Visual Studio 
+           12.x\Common7\IDE folder. <i>In 64-bit windows, Program Files will be named Program Files(x86).</i>
+          </p><p>         
+          Windows will display 
+        a verification dialog before copying the file.</p>
+      <p>3) Open Visual Studio, select <b>Options</b> from 
+        the Tools menu, select <b>Text Editor</b>, and select <b>File Extension</b>. 
+        On the right side of the dialog (shown below), enter <b>asm</b> as the 
+        extension, select <b>Microsoft Visual C++</b> from the Editor list, and 
+        click the <b>Add</b> button. Click the <b>OK</b> button to save your changes.</p>
+      <p><img src="p21.gif" width="644" height="382"></p>
+      <p>
+		Close Visual Studio and restart it. Open your project and display an 
+      ASM file. You should see syntax highlighting in the editor. There is a 
+		glitch in the highlighting--assembly language comment line starts start with a 
+		semicolon, which C++ doesn't recognize. But this is a simple workaround: add
+		an extra // right after the semicolon, like this, which will cause the comments to
+		appear in their usual green color:
+		</p><pre>;// AddTwo.asm - adds two 32-bit integers.
+;// Chapter 3 example
+		</pre>  
+      <a href="http://kipirvine.com/asm/gettingStartedVS2015/index.htm#top">Return to top</a><br>
+      <p></p>
+      <hr>
+<div style="display:none">"
+      <h2><a name="batch"></a>Assembling, Linking, and Debugging a 32-bit Program with a Batch File</h2>
+        <p>Many people like to use a <i>Windows batch file</i> to assemble and link 
+        programs. A batch file is a text file containing a sequence of commands 
+        that execute as if they had been typed at the command prompt. In fact, 
+        they are powerful enough to contain variables, loops, IF statements, and 
+        so on. </p>
+      <p>The easiest way to run a batch file is to first open a Command window 
+        and then type the name of the batch file (along with arguments) at the 
+        command prompt. To open a Command window, you must execute a program named 
+        <b>cmd.exe</b>. We will make that easy for you. </p>
+        <b>Step 1: </b><a href="http://kipirvine.com/asm/gettingStartedVS2015/BatchSampleVS2013.zip">Download a ZIP file</a> containing the following items:<p></p>
+        <ul>
+            <li><b>A shortcut to cmd.exe,</b> which opens a Command window in the current 
+                directory</li>
+        <li><b>asm32.bat</b>, a batch file for assembling and linking programs</li>
+        <li><b>main.asm</b>, a sample assembly language program</li>
+      </ul>
+		<b>Step 2:</b> Extract the ZIP file into the c:\Irvine\Examples directory on 
+		your computer.
+		<p>
+		<b>Step 3: </b>If you're running 64-bit Windows, open the file with a text editor (such as NotePad++) and find this line:
+		  </p><pre>		  set VS_HOME=C:\Program Files\Microsoft Visual Studio 12.0 
+		  </pre>
+		  And change it to the correct path for Visual Studio:
+		  <pre>		  set VS_HOME=C:\Program Files (x86)\Microsoft Visual Studio 12.0 
+		  </pre>		  
+
+		  <b>Step 4: </b>Do the following:
+      <ul>
+        <li>Copy asm32.bat to any directory on your system path. By doing this, you make it possible for MS-Windows to recognize <b>asm32</b> as a valid command when typed at the MS-Windows command prompt.(If you want to find out which directories are on the current system path, type <b>path</b> and press Enter at the system command prompt.)</li>
+        <li>Double-click the shortcut to <b>cmd.exe</b>. A Command window should 
+          appear. </li>
+        <li>At the command prompt in this window, type <b>asm32</b> and press Enter. This
+		will execute the asm32 batch file and display help information.
+        </li>
+      </ul>
+
+<table width="70%" border="1" cellspacing="0" cellpadding="3">
+   <tbody><tr valign="top"> 
+     <td class="style2"> 
+<pre>This file assembles, links, and debugs a single assembly language
+source file. Before using it, install Visual Studio 2013 in the following
+directory: 
+
+    C:\Program Files\Microsoft Visual Studio 12.0
+
+
+Next, install the Irvine link libraires and include
+files in the following directory: C:\Irvine
+
+
+Finally, copy this batch file to a location on your system path.
+We recommend the following directory: 
+
+
+C:\Program Files\Microsoft Visual Studio 12.0\VC\bin
+
+
+Command-line syntax:
+
+  asm32 [/H | /h | -H | -h] -- display this help information
+
+  asm32 filelist -- assemble and link all files
+  asm32 /D filelist -- assemble, link, and debug
+  asm32 /C filelist -- assemble only
+
+&lt;filelist&gt; is a list of up to 5 filenames (without extensions),
+separated by spaces. The filenames are assumed to refer to files
+having .asm extensions. Command-line switches are case-sensitive.
+</pre>
+
+    </td>
+  </tr>
+</tbody></table>
+      <p>Type the following command to assemble and link a source file named <b>main.asm</b>:</p>
+      <pre>    asm32 main</pre>
+      <p>You should see the following messages: </p>
+      <table width="80%" border="1" cellspacing="0" cellpadding="12">
+        <tbody><tr> 
+          <td> 
+            <pre> Assembling: main.asm</pre>
+            <pre>The file main.obj was produced.
+..................................</pre>
+            <pre>Linking main.obj to the Irvine32, Kernel32, and User32 libraries.</pre>
+            <pre>The file main.exe was produced.
+..................................</pre>
+          </td>
+        </tr>
+      </tbody></table>
+      <p>In fact, several files were produced. </p>
+      <ul>
+        <li>main.obj - the object file</li>
+        <li>main.ilk - incremental link status file</li>
+        <li>main.pdb - debug symbol file</li>
+      </ul>
+	    <p>If there were syntax errors in your program, you would see error messages generated 
+        by the assembler. Here is an example:</p>
+      <pre> Assembling: main.asm<br>main.asm(9) : error A2008: syntax error : myMessage<br>main.asm(15) : error A2006: undefined symbol : myMessage
+</pre>
+      <p>You would then open the main.asm file with a text editor (such as Notepad), 
+        fix the errors, and run the asm32 batch file again.</p>
+      <table width="90%" border="1" cellspacing="0" cellpadding="15">
+        <tbody><tr> 
+          <td>Although we used a file named main.asm in this example, the asm32.bat 
+            batch file will work for any assembly language file, regardless of 
+            the name. The only requirement is that your assembly language source 
+            file have a <b>.asm</b> filename extension. </td>
+        </tr>
+      </tbody></table>
+      <h4>Assembling Programs in Other Directories</h4>
+      <p>No doubt, you will want to assemble programs in various different disk 
+        folders, not just the batch_sample folder used in the foregoing example. 
+        All you need to do is copy the <b>cmd.exe</b> shortcut we gave you to 
+        your working directory, where your assembly language source files are 
+        located. When you double-click to run the shortcut, it will open a Command 
+        window in the current folder.</p>
+      <h4>Assembling, Linking, and Debugging<br>
+      </h4>
+      <p> </p>
+      <p>In addition to assembling and linking, you can use the asm32.bat file 
+        to launch your program in the Visual Studio debugger. Try the following 
+        command:</p>
+      <pre>    asm32 /D main</pre>
+      <p></p>
+      <p>If the program assembles and links with no errors, your program should 
+        load in Visual Studio. The first time you do this with a new program, 
+        the source code will not appear. All you have to do is press the <b>F10 
+        key</b> to begin debugging, and your program should appear with a yellow 
+        band across the first executable line:</p>
+      <p><img src="p24.gif" width="729" height="574"></p>
+      <p>(Depending on how Visual Studio is configured, you might have to press 
+        F8 to do the same thing.)</p>
+      <p>From here, you can step through the program. When you get to the call 
+        to WriteString, you can even trace into its code by pressing the F11 key 
+        (trace to). When you finish, close Visual Studio.</p>
+      <p>From this time on, when you load the same program in the Visual Studio 
+        debugger, your source code will appear right away.</p>
+      <h4>Assembling without Linking</h4>
+      <p>Occasionally, you may want to assemble programs but not link them. This 
+        happens, for example, when you are creating a multimodule project and 
+        you want to assemble each asm file into an obj file separately before 
+        linking them into the final exe program. Or, you might be assembling a 
+        module to be inserted into a link library (like Irvine32.lib).</p>
+      <p>To assemble a source file only, inser the /C option before the name of 
+        the file being assembled: </p>
+      <pre>    asm32 /C main</pre>
+      <p>You should see the following output:</p>
+      <pre> Assembling: main.asm</pre>
+      <pre>The file main.obj was produced.
+..................................
+</pre>
+      <p>If you are interested in learning more about how batch file commands 
+        work, here are some reference links we found:</p>
+      <ul>
+        <li>Microsoft TechNet article: 
+            <a href="http://technet.microsoft.com/en-us/library/cc750054.aspx">Creating 
+          Truly Powerful Batch Files</a>, by Brien Posey </li>
+        <li>Microsoft TechNet article: 
+            <a href="http://technet.microsoft.com/en-us/library/cc750056.aspx">Using 
+          Batch Files in Windows NT</a>, by Troy Thompson</li>
+      </ul>
+      <p>Links go out of date quickly, but you can do a web search for <i>Windows batch 
+        files</i> and get plenty of hits.</p>
+      <p>
+        <a href="http://kipirvine.com/asm/gettingStartedVS2015/index.htm#top">Return to top</a><br>
+    </p></div></td>
+  </tr>
+</tbody></table>
+
+
+
+	<a name="Windows7"></a>
+	<hr>
+	<h3>&nbsp;</h3>
+	<p>
+		&nbsp;</p>
+	<p>
+		&nbsp;</p>
+	<p>
+		&nbsp;</p>
+	<p>
+		&nbsp;</p>
+	<p>
+		&nbsp;</p>
+	<p>
+		&nbsp;</p>
+	<p>
+		&nbsp;</p>
+	<p>
+		&nbsp;</p>
+	<p>
+		&nbsp;</p>
+	<p>
+		&nbsp;</p>
+	<p>
+		&nbsp;</p>
+	<p>
+		&nbsp;</p>
+	<p>
+		&nbsp;</p>
+	<p>
+		&nbsp;</p>
+	<p>
+		&nbsp;</p>
+	<p>
+		&nbsp;</p>
+	<p>
+		&nbsp;</p>
+	<p>
+		&nbsp;</p>
+	<p>
+		&nbsp;</p>
+	<p>
+		&nbsp;</p>
+	<p>
+		&nbsp;</p>
+	<p>
+		&nbsp;</p>
+	<p>
+		&nbsp;</p>
+	<p>
+		&nbsp;</p>
+	<p>
+		&nbsp;</p>
+	
+	<p>
+		&nbsp;</p>
+		
+<div style="display:none">		
+      <table width="95%" border="1" cellspacing="0" cellpadding="3">
+        <tbody><tr valign="top"> 
+          <td> 
+            <p><i><b>Tip:</b></i> If the <i>Solution Explorer</i> window is not 
+              visible, select <i>Solution Explorer </i>from the <i>View</i> menu. 
+              Also, if you do not see <i>main.asm</i> in the Solution Explorer 
+              window, it might be hidden behind another window. To bring it to the front, click the
+			  <i>Solution Explorer</i> tab from the tabs shown along the bottom of the window.</p>
+          </td>
+        </tr>
+      </tbody></table>		
+</div>		
+		
+
+
+</body></html>
