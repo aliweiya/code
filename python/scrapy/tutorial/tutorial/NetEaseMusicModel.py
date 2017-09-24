@@ -29,3 +29,10 @@ class Song(Base):
     songAlbumId = Column(String, ForgienKey('Album.albumId'))
     songSingerId = Column(String, ForgienKey('Singer.singerId'))
     commentCount = Column(Integer, default=0)
+
+def save_singer():
+    global engine
+    global session
+
+    if engine is None or session is None:
+        

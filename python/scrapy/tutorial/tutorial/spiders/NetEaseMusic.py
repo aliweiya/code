@@ -1,8 +1,15 @@
 # -*- coding: utf-8 -*-
 
+import sys
+
 from scrapy.http import Request
 from scrapy import Spider
 from bs4 import BeautifulSoup
+
+sys.path.append('/../')
+
+from NetEaseMusicModel import save_singer
+
 
 class NetEaseMusic(Spider):
     name = 'NetEaseMusic'
@@ -49,5 +56,7 @@ class NetEaseMusic(Spider):
 
             singer_id = link.get('href').replace('/artist?id=', '')
             singer_name = link.text
+
+            save_singer()
 
             
