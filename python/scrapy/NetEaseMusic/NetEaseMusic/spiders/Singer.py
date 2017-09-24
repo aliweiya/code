@@ -1,18 +1,15 @@
 # -*- coding: utf-8 -*-
 
-import sys
-
 from scrapy.http import Request
 from scrapy import Spider
 from bs4 import BeautifulSoup
 
-sys.path.append('/../')
 
-from NetEaseMusicModel import save_singer
+class Singer(Spider):
+    name = 'Singer'
 
-
-class NetEaseMusic(Spider):
-    name = 'NetEaseMusic'
+    client = MongoClient('localhost', 27017)
+    db = client['NetEaseMusic']
 
     # enter from singers
     singer_category = [
@@ -43,20 +40,28 @@ class NetEaseMusic(Spider):
         #     f.write(response.body)
         #     f.close()
 
-        soup = BeautifulSoup(response.body)
-        singer_list = soup.find('ul', id='m-artist-box')
-        singer_li = singer_list.find_all('li')
-        for li in singer_li:
-            li_class = li.get('class')
-            if (not li_class) or li_class == 'line':
-                link = li.p.a
+        try:
+            soup = BeautifulSoup(''.join(f.readlines()))
+            singer_list = soup.find('ul', id='m-artist-box')
+            singer_li = singer_list.find_all('li')
+            for li in singer_li:
+                li_class = li.get('class')
+                if (not li_class) or li_class == 'line':
+                    link = li.p.a
 
-            elif li.get('class') == 'sml':
-                link = li.a
+                elif li.get('class') == 'sml':
+                    link = li.a
 
-            singer_id = link.get('href').replace('/artist?id=', '')
-            singer_name = link.text
+                singer_id = link.get('href').replace('/artist?id=', '')
+                singer_name = link.text
+                if db.singer.find({'id': singer_id}).count() == 0:
+                    db.singer.save({'id': singer_id, 'name': singer_name})
+                    print 'insert %s succeeded!' %(singer_id)
+                else:
+                    print '%s exists!' % (singer_id)
 
-            save_singer()
+        except:
+            print 'occuring an error when parsing page %s' %(filename)
+            continue
 
             

@@ -17,7 +17,7 @@ cursor = conn.cursor()
 from pymongo import MongoCLient
 client = MongoClient('mongodb://test:test@localhost:227017/test')
 # or
-client = MongoClient('localhost', '27017')
+client = MongoClient('localhost', 27017)
 db = client['test']
 db.authenticate('test', 'test')
 
