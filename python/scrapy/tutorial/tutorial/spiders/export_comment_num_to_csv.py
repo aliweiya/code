@@ -5,10 +5,10 @@ from pymongo import MongoClient
 import codecs
 
 
-client = MongoClient('127.0.0.1', 27017)
-db = client['music']
-
 def export_to_csv():
+
+    client = MongoClient('127.0.0.1', 27017)
+    db = client['music']
 
     csvFile = file('comments.csv', 'wb')
     csvFile.write(codecs.BOM_UTF8)

@@ -14,7 +14,7 @@ CREATE TABLE Album(
 -- a song is not necessarily in a album, or a singer, 
 -- maybe just a user
 CREATE TABLE Song(
-    songID VARCHAR(20),
+    songId VARCHAR(20),
     songAlbumId VARCHAR(10), 
     songSingerId VARCHAR(10),
     commentCount INT,
