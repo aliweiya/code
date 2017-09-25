@@ -3,6 +3,7 @@
 from scrapy.http import Request
 from scrapy import Spider
 from bs4 import BeautifulSoup
+from pymongo import MongoClient
 
 
 class Singer(Spider):
@@ -62,6 +63,5 @@ class Singer(Spider):
 
         except:
             print 'occuring an error when parsing page %s' %(filename)
-            continue
 
             
