@@ -31,7 +31,7 @@ class Album(Spider):
         #     f.close()
 
         try:
-            soup = BeautifulSoup(''.join(f.readlines()))
+            soup = BeautifulSoup(response.body)
             album_list = soup.find('ul', id='m-song-module')
             album_li = album_list.find_all('li')
             for li in album_li:
@@ -39,12 +39,11 @@ class Album(Spider):
                 albumId = link.get('href').replace('/album?id=', '')
                 albumName = link.text
 
-                if db.album.find({'id':albumId}).count() == 0:
+                if self.db.album.find({'id':albumId}).count() == 0:
                     album = {'id': albumId, 'name': albumName}
-                    db.album.save(album)
+                    self.db.album.save(album)
                     print 'insert %s succeeded!' %(albumId)
 
         except Exception, e:
-            print 'occuring an error when parsing page %s' %(filename)
             print e
 

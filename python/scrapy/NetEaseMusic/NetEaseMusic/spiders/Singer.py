@@ -42,7 +42,7 @@ class Singer(Spider):
         #     f.close()
 
         try:
-            soup = BeautifulSoup(''.join(f.readlines()))
+            soup = BeautifulSoup(response.body)
             singer_list = soup.find('ul', id='m-artist-box')
             singer_li = singer_list.find_all('li')
             for li in singer_li:
@@ -55,13 +55,13 @@ class Singer(Spider):
 
                 singer_id = link.get('href').replace('/artist?id=', '')
                 singer_name = link.text
-                if db.singer.find({'id': singer_id}).count() == 0:
-                    db.singer.save({'id': singer_id, 'name': singer_name})
+                if self.db.singer.find({'id': singer_id}).count() == 0:
+                    self.db.singer.save({'id': singer_id, 'name': singer_name})
                     print 'insert %s succeeded!' %(singer_id)
                 else:
                     print '%s exists!' % (singer_id)
 
-        except:
-            print 'occuring an error when parsing page %s' %(filename)
+        except Exception, e:
+            print e
 
             
