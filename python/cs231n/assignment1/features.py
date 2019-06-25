@@ -1,144 +1,9 @@
-import matplotlib
 import numpy as np
-from scipy.ndimage import uniform_filter
 
+from cs231n.classifier.linear_classifier import LinearSVM
 from cs231n.datasets.cifar10 import get_CIFAR10_data
-
-##############################################################################
-# Extract features
-##############################################################################
-def rgb2gray(rgb):
-    """Convert RGB image to grayscale
-
-    Parameters:
-        rgb : RGB image
-
-    Returns:
-        gray : grayscale image
-
-    """
-    return np.dot(rgb[...,:3], [0.299, 0.587, 0.144])
-
-# HOG feature
-def hog_feature(im):
-    """Compute Histogram of Gradient (HOG) feature for an image
-
-    Links:
-        - https://scikit-image.org/docs/dev/auto_examples/features_detection/plot_hog.html
-
-    Reference:
-        - Histograms of Oriented Gradients for Human Detection, Navneet Dalal and Bill Triggs, CVPR 2005
-    """
-    if im.ndim == 3:
-        image = rgb2gray(im)
-    else:
-        # 如果输入数组维度小于2，则转换成二维数组
-        image = np.atleast_2d(im)
-
-    sx, sy = image.shape # image size
-    orientations = 9 # number of gradient bins
-    cx, cy = (8, 8) # pixels per cell
-
-    gx = np.zeros(image.shape)
-    gy = np.zeros(image.shape)
-    gx[:, :-1] = np.diff(image, n=1, axis=1) # compute gradient on x-direction
-    gy[:-1, :] = np.diff(image, n=1, axis=0) # compute gradient on y-direction
-    grad_mag = np.sqrt(gx ** 2 + gy ** 2) # gradient magnitude
-    grad_ori = np.arctan2(gy, (gx + 1e-15)) * (180 / np.pi) + 90 # gradient orientation
-
-    n_cellsx = int(np.floor(sx / cx))  # number of cells in x
-    n_cellsy = int(np.floor(sy / cy))  # number of cells in y
-
-    # compute orientations integral images
-    orientation_histogram = np.zeros((n_cellsx, n_cellsy, orientations))
-
-    for i in range(orientations):
-        # create new integral image for this orientation
-        # isolate orientations in this range
-        temp_ori = np.where(grad_ori < 180 / orientations * (i + 1),
-                            grad_ori, 0)
-        temp_ori = np.where(grad_ori >= 180 / orientations * i,
-                            temp_ori, 0)
-        # select magnitudes for those orientations
-        cond2 = temp_ori > 0
-        temp_mag = np.where(cond2, grad_mag, 0)
-        orientation_histogram[:,:,i] = uniform_filter(temp_mag, size=(cx, cy))[int(cx/2)::cx, int(cy/2)::cy].T
-    
-    return orientation_histogram.ravel()
-
-def color_histogram_hsv(im, nbin=10, xmin=0, xmax=255, normalized=True):
-    """
-    Compute color histogram for an image using hue.
-
-    Inputs:
-        - im: H x W x C array of pixel data for an RGB image.
-        - nbin: Number of histogram bins. (default: 10)
-        - xmin: Minimum pixel value (default: 0)
-        - xmax: Maximum pixel value (default: 255)
-        - normalized: Whether to normalize the histogram (default: True)
-
-    Returns:
-        1D vector of length nbin giving the color histogram over the hue of the
-        input image.
-    """
-    ndim = im.ndim
-    bins = np.linspace(xmin, xmax, nbin+1)
-    hsv = matplotlib.colors.rgb_to_hsv(im/xmax) * xmax
-    imhist, bin_edges = np.histogram(hsv[:,:,0], bins=bins, density=normalized)
-    imhist = imhist * np.diff(bin_edges)
-
-    # return histogram
-    return imhist
-
-def extract_features(imgs, feature_fns, verbose=False):
-    """
-    Given pixel data for images and several feature functions that can operate on
-    single images, apply all feature functions to all images, concatenating the
-    feature vectors for each image and storing the features for all images in
-    a single matrix.
-
-    Inputs:
-        - imgs: N x H X W X C array of pixel data for N images.
-        - feature_fns: List of k feature functions. The ith feature function should
-        take as input an H x W x D array and return a (one-dimensional) array of
-        length F_i.
-        - verbose: Boolean; if true, print progress.
-
-    Returns:
-        An array of shape (N, F_1 + ... + F_k) where each column is the concatenation
-        of all features for a single image.
-    """
-    num_images = imgs.shape[0]
-    if num_images == 0:
-        return np.array([])
-
-    # Use the first image to determine feature dimensions
-    feature_dims = []
-    first_image_features = []
-    for feature_fn in feature_fns:
-        feats = feature_fn(imgs[0].squeeze())
-        assert len(feats.shape) == 1, 'Feature functions must be one-dimensional'
-        feature_dims.append(feats.size)
-        first_image_features.append(feats)
-
-    # Now that we know the dimensions of the features, we can allocate a single
-    # big array to store all features as columns.
-    total_feature_dim = sum(feature_dims)
-    imgs_features = np.zeros((num_images, total_feature_dim))
-    imgs_features[0] = np.hstack(first_image_features).T
-
-    # Extract features for the rest of the images.
-    for i in range(1, num_images):
-        idx = 0
-        for feature_fn, feature_dim in zip(feature_fns, feature_dims):
-            next_idx = idx + feature_dim
-            imgs_features[i, idx:next_idx] = feature_fn(imgs[i].squeeze())
-            idx = next_idx
-        if verbose and i % 1000 == 0:
-            print('Done extracting features for %d / %d images' % (i, num_images))
-
-    return imgs_features
-
+from cs231n.features import hog_feature, color_histogram_hsv, extract_features
+from cs231n.classifier.neural_net import TwoLayerNet
 
 def main():
     X_train, y_train, X_val, y_val, X_test, y_test = get_CIFAR10_data()
@@ -167,13 +32,69 @@ def main():
     X_test_features = np.hstack([X_test_features, np.ones((X_test_features.shape[0], 1))])
 
     # Train SVM on features
+    learning_rates = [5e-9, 1e-8, 5e-7]
+    regularization_strengths = [(5+i)*1e6 for i in range(-3, 4)]
 
+    results = {}
+    best_val = -1
+    best_svm = None
+
+    for rs in regularization_strengths:
+        for lr in learning_rates:
+            svm = LinearSVM()
+            loss_hist = svm.train(X_train_features, y_train, lr, rs, num_iters=6000)
+            y_train_pred = svm.predict(X_train_features)
+            train_accuracy = np.mean(y_train == y_train_pred)
+            y_val_pred = svm.predict(X_val_features)
+            val_accuracy = np.mean(y_val == y_val_pred)
+            if val_accuracy > best_val:
+                best_val = val_accuracy
+                best_svm = svm           
+            results[(lr,rs)] = train_accuracy, val_accuracy
+
+    for lr, reg in sorted(results):
+        train_accuracy, val_accuracy = results[(lr, reg)]
+        print('lr %e reg %e train accuracy: %f val accuracy: %f' % (
+                    lr, reg, train_accuracy, val_accuracy))
+
+    print('best validation accuracy achieved during cross-validation: %f' % best_val)
+
+    # Evaluate your trained SVM on the test set
+    y_test_pred = best_svm.predict(X_test_features)
+    test_accuracy = np.mean(y_test == y_test_pred)
+    print(test_accuracy)
+
+    # Neural Network on image features
+    input_dim = X_train_features.shape[1]
+    hidden_dim = 500
+    num_classes = 10
+
+    net = TwoLayerNet(input_dim, hidden_dim, num_classes)
+    best_net = None
+
+    results = {}
+    best_val = -1
+    best_net = None
+
+    learning_rates = [1e-2, 1e-1, 5e-1, 1, 5]
+    regularization_strengths = [1e-3, 5e-3, 1e-2, 1e-1, 0.5, 1]
+
+    for lr in learning_rates:
+        for reg in regularization_strengths:
+            net = TwoLayerNet(input_dim, hidden_dim, num_classes)
+            print("Training with lr={}, reg={}".format(lr, reg))
+            stats = net.train(X_train_features, y_train, X_val_features, y_val, num_iters=1500, batch_size=200, learning_rate=lr, reg=reg)
+            val_acc = (net.predict(X_val_features) == y_val).mean()
+            if val_acc > best_val:
+                best_val = val_acc
+                best_net = net
+            results[(lr, reg)] = val_acc
+
+    for lr, reg in sorted(results):
+        val_acc = results[(lr, reg)]
+        print('lr {} reg {} val accuracy: {}'.format(lr, reg, val_acc))
+
+    print('best validation accuracy achieved during cross-validation: {}'.format(best_val))
 
 if __name__ == '__main__':
-    from line_profiler import LineProfiler
-    lp = LineProfiler()
-    # 这个是要调用的函数，作为参数传递进去
-    lp_wrapper = lp(main)
-    # 等于直接调用main，参数也是main的
-    lp_wrapper()
-    lp.print_stats()
+    main()
