@@ -120,36 +120,36 @@ def main():
     net = TwoLayerNet(input_size, hidden_size, num_classes)
 
     # Train the network
-    # stats = net.train(X_train, y_train, X_val, y_val,
-    #                   num_iters=1000, batch_size=200,
-    #                   learning_rate=1e-4, learning_rate_decay=0.95,
-    #                   reg=0.5, verbose=True)
+    stats = net.train(X_train, y_train, X_val, y_val,
+                      num_iters=1000, batch_size=200,
+                      learning_rate=1e-4, learning_rate_decay=0.95,
+                      reg=0.5, verbose=True)
 
-    # val_acc = (net.predict(X_val) == y_val).mean()
-    # print("Validation accuracy: {}".format(val_acc))
+    val_acc = (net.predict(X_val) == y_val).mean()
+    print("Validation accuracy: {}".format(val_acc))
 
     # Debug the training
     # Plot the loss function and train / validation accuracies
-    # plt.subplot(2, 1, 1)
-    # plt.plot(stats['loss_history'], label='train')
-    # plt.title('Loss history')
-    # plt.xlabel('Iteration')
-    # plt.ylabel('Loss')
+    plt.subplot(2, 1, 1)
+    plt.plot(stats['loss_history'], label='train')
+    plt.title('Loss history')
+    plt.xlabel('Iteration')
+    plt.ylabel('Loss')
 
-    # plt.tight_layout()
+    plt.tight_layout()
 
-    # plt.subplot(2, 1, 2)
-    # plt.plot(stats['train_acc_history'], label='train')
-    # plt.plot(stats['val_acc_history'], label='val')
-    # plt.title('Classification accuracy history')
-    # plt.xlabel('Epoch')
-    # plt.ylabel('Classification accuracy')
+    plt.subplot(2, 1, 2)
+    plt.plot(stats['train_acc_history'], label='train')
+    plt.plot(stats['val_acc_history'], label='val')
+    plt.title('Classification accuracy history')
+    plt.xlabel('Epoch')
+    plt.ylabel('Classification accuracy')
 
-    # plt.tight_layout()
-    # plt.show()
+    plt.tight_layout()
+    plt.show()
 
     # Visualize the weights of the network
-    # show_net_weights(net)
+    show_net_weights(net)
 
     # Below, you should experiment with different values of the various
     # hyperparameters, including hidden layer size, learning rate, numer
@@ -162,7 +162,7 @@ def main():
     best_val_acc = 0
     best_net = None
 
-    learning_rates = np.array([0.7, 0.8, 0.9, 1, 1,1]) * 1e-3
+    learning_rates = np.array([0.7, 0.8, 0.9, 1, 1.1]) * 1e-3
     regularization_strengths = [0.75, 1, 1.25]
 
     print("Running...")

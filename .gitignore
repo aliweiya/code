@@ -2,3 +2,7 @@
 *.db
 **/venv/
 target
+build
+*.pyd
+im2col_cython.c
+.vscode

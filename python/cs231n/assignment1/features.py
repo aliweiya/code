@@ -69,14 +69,14 @@ def main():
     hidden_dim = 500
     num_classes = 10
 
-    net = TwoLayerNet(input_dim, hidden_dim, num_classes)
+    # net = TwoLayerNet(input_dim, hidden_dim, num_classes)
     best_net = None
 
     results = {}
     best_val = -1
     best_net = None
 
-    learning_rates = [1e-2, 1e-1, 5e-1, 1, 5]
+    learning_rates = [1e-2, 1e-1, 5e-1, 5e-8, 5e-7, 5e-9]
     regularization_strengths = [1e-3, 5e-3, 1e-2, 1e-1, 0.5, 1]
 
     for lr in learning_rates:
