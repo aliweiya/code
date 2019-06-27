@@ -1,19 +1,15 @@
 import numpy as np
 
-from cs231n.classifiers.layers import affine_forward, affine_backward
+from cs231n.classifiers.layers import affine_forward, affine_backward, relu_forward, relu_backward
+from cs231n.classifiers.layer_utils import affine_relu_forward, affine_relu_backward
 from cs231n.datasets.cifar10 import get_CIFAR10_data
-from cs231n.gradient_check import eval_numerical_gradient_array
+from cs231n.gradient_check import eval_numerical_gradient, eval_numerical_gradient_array
 
 def rel_error(x, y):
     """ returns relative error """
     return np.max(np.abs(x - y) / (np.maximum(1e-8, np.abs(x) + np.abs(y))))
 
-def main():
-    data = get_CIFAR10_data()
-
-    # for v in data:
-    #     print('{}'.format(v.shape))
-
+def affine_test():
     # Affine layer: forward
     # Test the affine_forward function
     num_inputs = 2
@@ -51,6 +47,81 @@ def main():
     print("dx error: {}".format(rel_error(dx_num, dx)))
     print("dw error: {}".format(rel_error(dw_num, dw)))
     print("db error: {}".format(rel_error(db_num, db)))
+
+def relu_test():
+    # Relu layer: forward
+    x = np.linspace(-0.5, 0.5, num=12).reshape(3, 4)
+    out, _ = relu_forward(x)
+    correct_out = np.array([[ 0.,          0.,          0.,          0.,        ],
+                            [ 0.,          0.,          0.04545455,  0.13636364,],
+                            [ 0.22727273,  0.31818182,  0.40909091,  0.5,       ]])
+    print("Testing relu_forward function:")
+    print("Difference: {}".format(rel_error(out, correct_out)))
+
+    x = np.random.randn(10, 10)
+    dout = np.random.randn(*x.shape)
+
+    dx_num = eval_numerical_gradient_array(lambda x: relu_forward(x)[0], x, dout)
+    _, cache = relu_forward(x)
+    dx = relu_backward(dout, cache)
+
+    print("Training relu_backward function:")
+    print("dx error: {}".format(rel_error(dx_num, dx)))
+
+def sandwich_layer_test():
+    x = np.random.randn(2, 3, 4)
+    w = np.random.randn(12, 10)
+    b = np.random.randn(10)
+    dout = np.random.randn(2, 10)
+
+    out, cache = affine_relu_forward(x, w, b)
+    dx, dw, db = affine_relu_backward(dout, cache)
+
+    dx_num = eval_numerical_gradient_array(lambda x: affine_relu_forward(x, w, b)[0], x, dout)
+    dw_num = eval_numerical_gradient_array(lambda w: affine_relu_forward(x, w, b)[0], w, dout)
+    db_num = eval_numerical_gradient_array(lambda b: affine_relu_forward(x, w, b)[0], b, dout)
+
+    print("Testing affine_relu_forward:")
+    print("dx error: {}".format(rel_error(dx_num, dx)))
+    print('dw error: {}'.format(rel_error(dw_num, dw)))
+    print('db error: {}'.format(rel_error(db_num, db)))
+
+def loss_layer_test():
+    num_classes, num_inputs = 10, 50
+    x = 0.001 * np.random.randn(num_inputs, num_classes)
+    y = np.random.randint(num_classes, size=num_inputs)
+
+    dx_num = eval_numerical_gradient(lambda x: svm_loss(x, y)[0], x, verbose=False)
+    loss, dx = svm_loss(x, y)
+
+    print("Testing svm_loss:")
+    print("loss: {}".format(loss))
+    print("dx error: {}".format(rel_error(dx_num, dx)))
+
+    dx_num = eval_numerical_gradient(lambda x: softmax_loss(x, y)[0], x, verbose=False)
+    loss, dx = softmax_loss(x, y)
+
+    print("Testing softmax loss")
+    print("loss: {}".format(loss))
+    print("dx error: {}".format(rel_error(dx_num, dx)))
+
+def main():
+    # data = get_CIFAR10_data()
+
+    # for v in data:
+    #     print('{}'.format(v.shape))
+
+    # Test for ReLU
+    # relu_test()
+
+    # Sandwich layers
+    # There are some common patterns of layers that are frequently used in neural nets.
+    # For example, affine layers are frequently followed by a ReLU nonlinearlity. To make
+    # these common patterns easy, we define several convenience layers in the layer_utils.py
+    # sandwich_layer_test()
+
+    # Loss layers: Softmax and SVM
+    loss_layer_test()
 
 if __name__ == '__main__':
     main()

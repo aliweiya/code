@@ -9,6 +9,8 @@ def affine_forward(x, w, b):
     reshape each input into a vector of dimension D=d1 * ... * dk, and
     then transform it to an output vector of dimension M.
 
+    N is the number of input neurons, M is the number of output neurons.
+
     Inputs:
     - x: A numpy array containing input data, of shape (N, d_1, ..., d_k)
     - w: A numpy array of weights, of shape (D, M)
@@ -48,3 +50,34 @@ def affine_backward(dout, cache):
     dw = x_rsp.T.dot(dout)
     db = np.sum(dout, axis=0)
     return dx, dw, db
+
+def relu_forward(x):
+    """
+    Computes the forward pass for a layer of rectified linear units(ReLUs)
+
+    Inputs:
+        - x: Inputs of any shape
+
+    Returns a tuple of:
+        - out: Output, of the same shape as x
+        - cache: x
+    """
+    out = x * (x > 0)
+    cache = x
+    return out, cache
+
+def relu_backward(dout, cache):
+    """
+    Computes the backward pass for a layer of rectified linear units (ReLUs)
+
+    Input:
+        - dout: Upstream derivatives, of any shape
+        - cache: Input x, of same shape as dout
+
+    Returns:
+        - dx: Gradient with respect to x
+    """
+    x = cache
+    dx = (x > 0) * dout
+
+    return dx
