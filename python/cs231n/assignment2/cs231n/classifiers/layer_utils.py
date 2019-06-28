@@ -1,3 +1,5 @@
+import numpy as np
+
 from .layers import affine_forward,\
     affine_backward, relu_forward, relu_backward
 
