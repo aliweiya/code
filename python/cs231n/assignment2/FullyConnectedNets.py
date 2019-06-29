@@ -163,10 +163,18 @@ def two_layer_net_test():
 
 def solver_test():
     X_train, y_train, X_val, y_val, X_test, y_test = get_CIFAR10_data()
+    data = {
+        'X_train': X_train,
+        'y_train': y_train,
+        'X_val': X_val,
+        'y_val': y_val,
+        'X_test': y_test,
+        'y_test': y_test
+    }
     model = TwoLayerNet(reg=1e-1)
     solver = Solver(model,
                     data,
-                    optim_confif={'learning_rate': 1e-3,},
+                    optim_config={'learning_rate': 1e-3,},
                     lr_decay=0.8,
                     num_epochs=10, batch_size=100,
                     print_every=100)
