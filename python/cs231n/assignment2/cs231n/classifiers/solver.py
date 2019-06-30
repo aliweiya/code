@@ -236,7 +236,7 @@ class Solver:
                 self.val_acc_history.append(val_acc)
 
                 if self.verbose:
-                    print("(Epoch %d / %d) train acc: {}, val_acc: {}".format(self.epoch, self.num_epochs, train_acc, val_acc))
+                    print("(Epoch {} / {}) train acc: {}, val_acc: {}".format(self.epoch, self.num_epochs, train_acc, val_acc))
 
                 if val_acc > self.best_val_acc:
                     self.best_val_acc = val_acc

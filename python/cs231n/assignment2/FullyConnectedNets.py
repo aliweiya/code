@@ -1,3 +1,4 @@
+import matplotlib.pyplot as plt
 import numpy as np
 
 from cs231n.classifiers.fc_net import TwoLayerNet
@@ -6,6 +7,10 @@ from cs231n.classifiers.layer_utils import affine_relu_forward, affine_relu_back
 from cs231n.classifiers.solver import Solver
 from cs231n.datasets.cifar10 import get_CIFAR10_data
 from cs231n.gradient_check import eval_numerical_gradient, eval_numerical_gradient_array
+
+plt.rcParams['figure.figsize'] = (10.0, 8.0) # set default size of plots
+plt.rcParams['image.interpolation'] = 'nearest'
+plt.rcParams['image.cmap'] = 'gray'
 
 def rel_error(x, y):
     """ returns relative error """
@@ -175,7 +180,7 @@ def solver_test():
     solver = Solver(model,
                     data,
                     optim_config={'learning_rate': 1e-3,},
-                    lr_decay=0.8,
+                    lr_decay=0.7,
                     num_epochs=10, batch_size=100,
                     print_every=100)
 
@@ -184,6 +189,25 @@ def solver_test():
     y_pred = np.argmax(scores, axis=1)
     acc = np.mean(y_pred == y_test)
     print("Test acc: {}".format(acc))
+
+    # Visualize training loss and train /val accuracy
+    plt.subplot(2,1,1)
+    plt.title('Training loss')
+    plt.plot(solver.loss_history, 'o')
+    plt.xlabel("Iteration")
+
+    plt.subplot(2, 1, 2)
+    plt.title("Accuracy")
+    plt.plot(solver.train_acc_history, "-o", label="train")
+    plt.plot(solver.val_acc_history, "-o", label="val")
+    plt.plot([0.5] * len(solver.val_acc_history), 'k--')
+    plt.xlabel("Epoch")
+    plt.legend(loc="lower right")
+    plt.gcf().set_size_inches(15, 12)
+    plt.show()
+
+def multilayer_network_test():
+    
 
 def main():
     # Test for ReLU
@@ -202,7 +226,8 @@ def main():
     # two_layer_net_test()
 
     # Solver
-    solver_test()
+    # solver_test()
+
 
 
 if __name__ == '__main__':
