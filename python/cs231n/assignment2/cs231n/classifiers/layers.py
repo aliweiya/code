@@ -154,7 +154,24 @@ def batchnorm_backward(dout, cache):
     batch normalization on paper and propagate gradients backward through
     intermediate nodes.
 
+    Inputs:
+        - dout: Upstream derivatives, of shape (N, D)
+        - cache: Variable of intermediates from batchnorm_forward
+
+    Returns a tuple of:
+        - dx: Gradient with respect to inputs x, of shape (N, D)
+        - dgamma: Gradient with respect to scale parameter gamma, of shape (D,)
+        - dbeta: Gradient with respect to shift parameter beta, of shape (D,)
     """
+    x, x_mean, x_var, x_normalized, beta, gamma, eps = cache
+    N = x.shape[0]
+    dbeta = np.sum(dout, axis=0)
+    dgamma = np.sum(x_normalized*dout, axis = 0)
+    dx_normalized = gamma* dout
+    dx_var = np.sum(-1.0/2*dx_normalized*(x-x_mean)/(x_var+eps)**(3.0/2), axis =0)
+    dx_mean = np.sum(-1/np.sqrt(x_var+eps)* dx_normalized, axis = 0) + 1.0/N*dx_var *np.sum(-2*(x-x_mean), axis = 0)
+    dx = 1/np.sqrt(x_var+eps)*dx_normalized + dx_var*2.0/N*(x-x_mean) + 1.0/N*dx_mean
+    return dx, dgamma, dbeta
 
 def svm_loss(X, y):
     """

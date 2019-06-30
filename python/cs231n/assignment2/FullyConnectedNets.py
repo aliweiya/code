@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-from cs231n.classifiers.fc_net import TwoLayerNet
+from cs231n.classifiers.fc_net import TwoLayerNet, FullyConnectedNet
 from cs231n.classifiers.layers import affine_forward, affine_backward, relu_forward, relu_backward
 from cs231n.classifiers.layer_utils import affine_relu_forward, affine_relu_backward
 from cs231n.classifiers.solver import Solver
@@ -207,7 +207,68 @@ def solver_test():
     plt.show()
 
 def multilayer_network_test():
-    
+    X_train, y_train, X_val, y_val, X_test, y_test = get_CIFAR10_data()
+    data = {
+        'X_train': X_train,
+        'y_train': y_train,
+        'X_val': X_val,
+        'y_val': y_val,
+        'X_test': y_test,
+        'y_test': y_test
+    }
+    # Initial loss and gradient check
+    # N, D, H1, H2, C = 2, 15, 20, 30, 10
+    # X = np.random.randn(N, D)
+    # y = np.random.randint(C, size=(N, ))
+
+    # print(X.shape)
+    # for reg in [0, 3.14]:
+    #     print("Running check with reg={}".format(reg))
+    #     model = FullyConnectedNet([H1, H2],
+    #                               input_dim=D,
+    #                               num_classes=C,
+    #                               reg=reg,
+    #                               weight_scale=5e-2,
+    #                               dtype=np.float64)
+    #     loss, grads = model.loss(X, y)
+    #     print("Initial loss: {}".format(loss))
+
+    #     for name in sorted(grads):
+    #         f = lambda _: model.loss(X, y)[0]
+    #         grad_num = eval_numerical_gradient(f, model.params[name], verbose=False, h=1e-5)
+    #         print("{} relative {}".format(name, rel_error(grad_num, grads[name])))
+
+    # As another sanity check (完整性检查), make sure you can overfit a smal dataset of 50 images.
+    # First we will try a three-layer network with 100 units in each hidden layer.
+    # You will need to tweak the learning rate and initialize scale, but you should
+    # be able to overfit and achieve 100% training accuracy within 20 epoches.
+    num_train = 50
+    small_data = {
+        'X_train': data['X_train'][:num_train],
+        'y_train': data['y_train'][:num_train],
+        'X_val': data['X_val'],
+        'y_val': data['y_val'],
+    }
+    weight_scale = 4e-2
+    learning_rate = 1e-3
+
+    model = FullyConnectedNet([100, 100],
+                            weight_scale=weight_scale,
+                            dtype=np.float64)
+    solver = Solver(model,
+                    small_data,
+                    print_every=10,
+                    num_epochs=20,
+                    batch_size=25,
+                    update_rule='sgd',
+                    optim_config={'learning_rate': learning_rate})
+    solver.train()
+
+    plt.plot(solver.loss_history, 'o')
+    plt.title('Training loss history')
+    plt.xlabel('Iteration')
+    plt.ylabel('Training loss')
+    plt.show()
 
 def main():
     # Test for ReLU
@@ -228,7 +289,8 @@ def main():
     # Solver
     # solver_test()
 
-
+    # Multilayer class
+    multilayer_network_test()
 
 if __name__ == '__main__':
     main()
