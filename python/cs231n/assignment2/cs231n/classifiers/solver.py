@@ -134,6 +134,7 @@ class Solver:
         """
         self.epoch = 0
         self.best_val_acc = 0
+        self.best_train_acc = 0
         self.best_params = {}
         self.loss_history = []
         self.train_acc_history = []
@@ -243,6 +244,8 @@ class Solver:
                     self.best_params = {}
                     for k, v in self.model.params.items():
                         self.best_params[k] = v.copy()
+                if train_acc > self.best_train_acc:
+                    self.best_train_acc = train_acc
 
         # At the end of the training swap the best params into the model
         self.model.params = self.best_params

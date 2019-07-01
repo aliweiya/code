@@ -1,7 +1,8 @@
 import numpy as np
 
 from .layers import affine_forward,\
-    affine_backward, relu_forward, relu_backward
+    affine_backward, relu_forward, relu_backward,\
+    batchnorm_forward, batchnorm_backward_alt
 
 def affine_relu_forward(x, w, b):
     """
@@ -27,3 +28,17 @@ def affine_relu_backward(dout, cache):
     da = relu_backward(dout, relu_cache)
     dx, dw, db = affine_backward(da, fc_cache)
     return dx, dw, db
+
+def affine_bn_relu_forward(x , w , b, gamma, beta, bn_param):
+    a, fc_cache = affine_forward(x, w, b)
+    bn, bn_cache = batchnorm_forward(a, gamma, beta, bn_param)
+    out, relu_cache = relu_forward(bn)
+    cache = (fc_cache, bn_cache, relu_cache)
+    return out, cache
+
+def affine_bn_relu_backward(dout, cache):
+    fc_cache, bn_cache, relu_cache = cache
+    dbn = relu_backward(dout, relu_cache)
+    da, dgamma, dbeta =  batchnorm_backward_alt(dbn, bn_cache)
+    dx, dw, db = affine_backward(da, fc_cache)
+    return dx, dw, db, dgamma, dbeta

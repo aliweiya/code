@@ -1,7 +1,9 @@
 import numpy as np
 
-from .layer_utils import affine_relu_forward, affine_relu_backward
-from .layers import affine_forward, affine_backward, softmax_loss
+from .layer_utils import affine_relu_forward, affine_relu_backward,\
+    affine_bn_relu_forward, affine_bn_relu_backward
+from .layers import affine_forward, affine_backward, softmax_loss,\
+    dropout_forward, dropout_backward
 
 class TwoLayerNet:
     """

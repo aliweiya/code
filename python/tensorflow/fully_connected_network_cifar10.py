@@ -111,7 +111,7 @@ def main():
     sess.run(init)
 
     batch_size = 50
-    for i in range(100000):
+    for i in range(1000):
         mask = np.random.choice(X_train.shape[0], batch_size)
         X_batch = X_train[mask].reshape(-1,3072)
         y_batch = y_train[mask]

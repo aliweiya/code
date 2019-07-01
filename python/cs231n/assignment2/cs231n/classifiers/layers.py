@@ -125,8 +125,9 @@ def batchnorm_forward(x, gamma, beta, bn_param):
     momentum = bn_param.get('momentum', 0.9)
 
     N, D = x.shape
-    running_mean = bn_param.get('running_mean', zp.zeors(D, dtype=x.dtype))
-    runng_var = bn_param.get('running_var', np.zeros(D, dtype=x.dtype))
+    out, cache = None, None
+    running_mean = bn_param.get('running_mean', np.zeros(D, dtype=x.dtype))
+    running_var = bn_param.get('running_var', np.zeros(D, dtype=x.dtype))
 
     if mode == 'train':
         sample_mean = np.mean(x, axis=0)
@@ -135,7 +136,7 @@ def batchnorm_forward(x, gamma, beta, bn_param):
         out = gamma * x_hat + beta
         cache = (gamma, x, sample_mean, sample_var, eps, x_hat)
         running_mean = momentum * running_mean +  (1 - momentum) * sample_mean
-        running_var = momentum * runng_var + (1 - momentum) * sample_var
+        running_var = momentum * running_var + (1 - momentum) * sample_var
 
     elif mode == 'test':
         scale = gamma / (np.sqrt(running_var + eps))
@@ -145,6 +146,8 @@ def batchnorm_forward(x, gamma, beta, bn_param):
 
     bn_param['running_mean'] = running_mean
     bn_param['running_var'] = running_var
+
+    return out, cache
 
 def batchnorm_backward(dout, cache):
     """
@@ -172,6 +175,88 @@ def batchnorm_backward(dout, cache):
     dx_mean = np.sum(-1/np.sqrt(x_var+eps)* dx_normalized, axis = 0) + 1.0/N*dx_var *np.sum(-2*(x-x_mean), axis = 0)
     dx = 1/np.sqrt(x_var+eps)*dx_normalized + dx_var*2.0/N*(x-x_mean) + 1.0/N*dx_mean
     return dx, dgamma, dbeta
+
+def batchnorm_backward_alt(dout, cache):
+    """
+    Alternative backward pass for batch normalization.
+    
+    For this implementation you should work out the derivatives for the batch
+    normalizaton backward pass on paper and simplify as much as possible. You
+    should be able to derive a simple expression for the backward pass.
+    
+    Note: This implementation should expect to receive the same cache variable
+    as batchnorm_backward, but might not use all of the values in the cache.
+    
+    Inputs / outputs: Same as batchnorm_backward
+    """
+    dx, dgamma, dbeta = None, None, None
+    gamma, x, sample_mean, sample_var, eps, x_hat = cache
+    N = x.shape[0]
+    dx_hat = dout * gamma
+    dvar = np.sum(dx_hat* (x - sample_mean) * -0.5 * np.power(sample_var + eps, -1.5), axis = 0)
+    dmean = np.sum(dx_hat * -1 / np.sqrt(sample_var +eps), axis = 0) + dvar * np.mean(-2 * (x - sample_mean), axis =0)
+    dx = 1 / np.sqrt(sample_var + eps) * dx_hat + dvar * 2.0 / N * (x-sample_mean) + 1.0 / N * dmean
+    dgamma = np.sum(x_hat * dout, axis = 0)
+    dbeta = np.sum(dout , axis = 0)
+    
+    return dx, dgamma, dbeta
+
+def dropout_forward(x, dropout_param):
+    """
+    Performs the forward pass for (inverted) dropout.
+
+    Inputs:
+    - x: Input data, of any shape
+    - dropout_param: A dictionary with the following keys:
+        - p: Dropout parameter. We drop each neuron output with probability p.
+        - mode: 'test' or 'train'. If the mode is train, then perform dropout;
+        if the mode is test, then just return the input.
+        - seed: Seed for the random number generator. Passing seed makes this
+        function deterministic, which is needed for gradient checking but not in
+        real networks.
+
+    Outputs:
+    - out: Array of the same shape as x.
+    - cache: A tuple (dropout_param, mask). In training mode, mask is the dropout
+        mask that was used to multiply the input; in test mode, mask is None.
+    """
+    p, mode = dropout_param['p'], dropout_param['mode']
+    if 'seed' in dropout_param:
+        np.random.seed(dropout_param['seed'])
+
+    mask = None
+    out = None
+
+    if mode == 'train':
+        mask = (np.random.rand(*x.shape) >= p) / (1 - p)
+        #mask = (np.random.rand(x.shape[1]) >= p) / (1 - p)
+        out = x * mask
+    elif mode == 'test':
+        out = x
+
+    cache = (dropout_param, mask)
+    out = out.astype(x.dtype, copy=False)
+
+    return out, cache
+
+def dropout_backward(dout, cache):
+    """
+    Perform the backward pass for (inverted) dropout.
+
+    Inputs:
+    - dout: Upstream derivatives, of any shape
+    - cache: (dropout_param, mask) from dropout_forward.
+    """
+    dropout_param, mask = cache
+    mode = dropout_param['mode']
+    
+    dx = None
+    if mode == 'train':
+        dx = dout * mask
+    elif mode == 'test':
+        dx = dout
+    return dx
+
 
 def svm_loss(X, y):
     """
