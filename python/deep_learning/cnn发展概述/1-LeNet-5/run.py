@@ -1,4 +1,4 @@
-from lenet import LeNet5
+from mnist import LeNet5
 import torch
 import torch.nn as nn
 import torch.optim as optim

@@ -7,20 +7,18 @@ import torchvision.transforms as transforms
 from torch.utils.data import DataLoader
 import visdom
 
-dataset_path = 'G:\\dataset\\mnist'
+dataset_path = 'G:\\dataset\\cifar10'
 
 viz = visdom.Visdom()
 
 data_train = CIFAR10(dataset_path,
                    download=True,
                    transform=transforms.Compose([
-                       transforms.Resize((224, 224)),
                        transforms.ToTensor()]))
 data_test = CIFAR10(dataset_path,
                   train=False,
                   download=True,
                   transform=transforms.Compose([
-                      transforms.Resize((224, 224)),
                       transforms.ToTensor()]))
 data_train_loader = DataLoader(data_train, batch_size=256, shuffle=True, num_workers=8)
 data_test_loader = DataLoader(data_test, batch_size=1024, num_workers=8)
