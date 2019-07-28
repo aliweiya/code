@@ -28,6 +28,7 @@ class Lenet:
 
 
     def construct_net(self,is_trained = True):
+        # 常用于为tensorflow里的layer函数提供默认值以使构建模型的代码更加紧凑苗条
         with slim.arg_scope([slim.conv2d], padding='VALID',
                             weights_initializer=tf.truncated_normal_initializer(stddev=0.01),
                             weights_regularizer=slim.l2_regularizer(0.0005)):
