@@ -1,0 +1,16 @@
+apply plugin: 'war'
+apply from: 'https://raw.githubusercontent.com/gretty-gradle-plugin/gretty/master/pluginScripts/gretty-2.3.0.plugin'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    providedCompile 'javax.servlet:servlet-api:2.5'
+    runtime 'javax.servlet:jstl:1.1.2'
+}
+
+gretty {
+    contextPath = '/todo'
+    host = '0.0.0.0'
+}
