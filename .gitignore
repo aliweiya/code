@@ -6,3 +6,7 @@ build
 *.pyd
 im2col_cython.c
 .vscode
+.classpath
+.gradle/
+.settings/
+.project
