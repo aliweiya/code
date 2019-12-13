@@ -8,6 +8,7 @@ class Lenet:
         self.raw_input_image = tf.placeholder(tf.float32, [None, 784])
         self.input_images = tf.reshape(self.raw_input_image, [-1, 28, 28, 1])
         self.raw_input_label = tf.placeholder("float", [None, 10])
+        # tf.cast 类型转换
         self.input_labels = tf.cast(self.raw_input_label,tf.int32)
         self.dropout = cfg.KEEP_PROB
 
@@ -29,6 +30,8 @@ class Lenet:
 
     def construct_net(self,is_trained = True):
         # 常用于为tensorflow里的layer函数提供默认值以使构建模型的代码更加紧凑苗条
+        # padding为VALID表示 without padding
+        # 后面多的会被丢弃
         with slim.arg_scope([slim.conv2d], padding='VALID',
                             weights_initializer=tf.truncated_normal_initializer(stddev=0.01),
                             weights_regularizer=slim.l2_regularizer(0.0005)):
@@ -37,6 +40,8 @@ class Lenet:
             net = slim.conv2d(net,16,[5,5],1,scope='conv3')
             net = slim.max_pool2d(net, [2, 2], scope='pool4')
             net = slim.conv2d(net,120,[5,5],1,scope='conv5')
+            # 给定一个输入A， 此函数将其每个样本转化为一维的向量，然后返回一个tensor，其维度为（batchsize,k）,
+            # 一般应用在卷积神经网络全连接层前，因为全连接层需要将输入数据变为一个向量。
             net = slim.flatten(net, scope='flat6')
             net = slim.fully_connected(net, 84, scope='fc7')
             net = slim.dropout(net, self.dropout,is_training=is_trained, scope='dropout8')

@@ -6,6 +6,7 @@ class AlexNet(nn.Module):
   def __init__(self):
     super(AlexNet, self).__init__()
     self.features = nn.Sequential(
+      # in_channel, out_channel
       nn.Conv2d(3, 64, kernel_size=3, stride=2, padding=1),
       # raw kernel_size=11, stride=4, padding=2. For use img size 224 * 224.
       nn.ReLU(inplace=True),

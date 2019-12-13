@@ -8,7 +8,7 @@ from torchvision.datasets.cifar import CIFAR10
 import torchvision.transforms as transforms
 from torch.utils.data import DataLoader
 
-dataset_path = '../dataset/cifar'
+dataset_path = 'd:\\personal\\dataset\\cifar'
 
 """
     The CIFAR-10 dataset consists of 60000 32x32 colour images in 10 classes, 
