@@ -10,3 +10,4 @@ im2col_cython.c
 .gradle/
 .settings/
 .project
+.idea
