@@ -84,7 +84,7 @@ def nms(dets, thresh=0.7, mode="Union"):
         inds = np.where(overlap <= thresh)[0]
         order = order[inds + 1]
 
-    return dets[keep]
+    return keep
 
 def prelu(inputs):
     """
@@ -116,6 +116,21 @@ def calibrate(bbox, reg):
     aug = reg_m * reg
     bbox[:, 0:4] = bbox[:, 0:4] + aug
     return bbox
+
+def draw(frame, boxes, landmarks):
+    for box, landmark in zip(boxes, landmarks):
+        cv2.rectangle(frame, (int(box[1]), int(box[0])), (int(box[3]), int(box[2])), (0,255,0), 2)
+        for j in range(5):
+            cv2.circle(frame, (int(landmark[2*j]),int(int(landmark[2*j+1]))), 2, (0,255, 0))
+
+def landmark_to_location(boxes, landmarks):
+    widths = boxes[:, 2] - boxes[:, 0]
+    heights = boxes[:, 3] - boxes[:, 1]
+
+    landmarks[:, 0::2] = np.tile(boxes[:, 1], (5, 1)).T + landmarks[:, 0::2] * np.tile(heights, (5,1)).T
+    landmarks[:, 1::2] = np.tile(boxes[:, 0], (5, 1)).T + landmarks[:, 1::2] * np.tile(widths, (5,1)).T
+
+    return landmarks
 
 class PNet:
     """
@@ -255,7 +270,7 @@ class PNet:
 
         boxes = np.vstack(boxes)
         # 利用NMS去除冗余框
-        boxes = nms(boxes)
+        boxes = boxes[nms(boxes)]
         boxes = convert_to_square(boxes)
         boxes = pad(image, boxes)
         return boxes
@@ -268,6 +283,9 @@ class PNet:
                                                 feed_dict={self.image_placeholder: image, self.width_placeholder: width,
                                                         self.height_placeholder: height})
         return cls_prob, bbox_pred, landmark_pred
+
+    def export_to_pb(self):
+        tf.train.write_graph(self.sess.graph_def, 'protobuf/', 'pnet.pb', as_text=False)
 
 class RNet:
     """
@@ -326,13 +344,16 @@ class RNet:
         boxes = calibrate(boxes, bbox_pred[cls_index])
         boxes = convert_to_square(boxes)
         boxes = pad(image, boxes)
-        boxes = nms(boxes, 0.6)
+        boxes = boxes[nms(boxes, 0.6)]
         return boxes
 
     def predict(self, image):
         cls_prob, bbox_pred, landmark_pred = self.sess.run([self.cls_prob, self.bbox_pred, self.landmark_pred],
                                                 feed_dict={self.image_placeholder: image})
         return cls_prob, bbox_pred, landmark_pred
+
+    def export_to_pb(self):
+        tf.train.write_graph(self.sess.graph_def, 'protobuf/', 'rnet.pb', as_text=False)
 
 class ONet:
     """
@@ -389,16 +410,24 @@ class ONet:
         boxes = boxes[cls_index]
         # 修正
         boxes = calibrate(boxes, bbox_pred[cls_index])
-        boxes = nms(boxes, 0.6, 'Minimum')
+        keep = nms(boxes, 0.6, 'Minimum')
+        boxes = boxes[keep]
         boxes = pad(image, boxes)
-        for box in boxes:
-            image = cv2.rectangle(image, (int(box[1]), int(box[0])), (int(box[3]), int(box[2])), (0,255,0), 2)
+        landmarks = landmark_pred[cls_index][keep]
 
-        cv2.imshow('image', image)
-        cv2.waitKey()
-        return boxes
+        landmarks = landmark_to_location(boxes, landmarks)
+
+        # for box in boxes:
+        #     image = cv2.rectangle(image, (int(box[1]), int(box[0])), (int(box[3]), int(box[2])), (0,255,0), 2)
+
+        # cv2.imshow('image', image)
+        # cv2.waitKey()
+        return boxes, landmarks
 
     def predict(self, image):
         cls_prob, bbox_pred, landmark_pred = self.sess.run([self.cls_prob, self.bbox_pred, self.landmark_pred],
                                                 feed_dict={self.image_placeholder: image})
         return cls_prob, bbox_pred, landmark_pred
+
+    def export_to_pb(self):
+        tf.train.write_graph(self.sess.graph_def, 'protobuf/', 'onet.pb', as_text=False)

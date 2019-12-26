@@ -1,9 +1,8 @@
-import tensorflow as tf
+from alexnet import AlexNet
 
-IMAGE_SIZE = 28 * 28 * 3
+height, width, channel, num_class = 227, 227, 3, 2
 
-def main():
-    X = tf.placeholder(tf.loat32, [None, IMAGE_SIZE])
-    y_ = tf.placeholder(tf.float32, [None, 10])
+dataset_path = 'D:\\personal\\dataset\\dogs-vs-cats-redux-kernels-edition\\train'
 
-    
+alexNet = AlexNet(height, width, channel, num_class, dataset_path)
+alexNet.train()
