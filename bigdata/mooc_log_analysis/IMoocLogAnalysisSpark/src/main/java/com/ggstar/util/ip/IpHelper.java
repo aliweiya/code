@@ -19,9 +19,9 @@ public class IpHelper {
 
     private static IpTree ipTree = IpTree.getInstance();
 
-    private static final String ipFile = "ipDatabase.csv";
+    private static final String ipFile = "/ipDatabase.csv";
 
-    private static final String regionFile = "ipRegion.xlsx";
+    private static final String regionFile = "/ipRegion.xlsx";
 
     static{
         buildTrain();

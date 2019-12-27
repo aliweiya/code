@@ -1,15 +1,19 @@
 import glob
+from io import BytesIO
 import os
 import time
 
 import numpy as np
+from PIL import Image
 
-from skimage import io, transform
+import skimage
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import OneHotEncoder  
 from sklearn.utils import shuffle
 
 import tensorflow as tf
+
+VGG_MEAN = [104, 117, 123]
 
 class AlexNet:
     """
@@ -58,13 +62,12 @@ class AlexNet:
                                                       dtype=tf.float32), name="weights")
             # SAME: padding with inf, VALID: no padding
             # batch, height, width, channel
-            conv = tf.nn.conv2d(self.x, kernel, [1, 4, 4, 1], padding="SAME")
+            conv = tf.nn.conv2d(self.x, kernel, [1, 4, 4, 1], padding="VALID")
             biases = tf.Variable(tf.constant(0.0, shape=[96], dtype=tf.float32),
                                  trainable=True, name='biases')
             bias = tf.nn.bias_add(conv, biases)
             conv1 = tf.nn.relu(bias, name=scope)
 
-            # [?, 57, 57, 96]
             print(conv1.shape)
 
         with tf.name_scope('lrn1') as scope:
@@ -74,7 +77,7 @@ class AlexNet:
             在2015年 Very Deep Convolutional Networks for Large-Scale Image Recognition.提到LRN基本没什么用。
             """
             lrn1 = tf.nn.lrn(conv1, alpha=2e-5, beta=0.75,
-                             depth_radius=2, bias=2.0)
+                             depth_radius=2, bias=1.0)
 
         with tf.name_scope("pool1") as scope:
             """
@@ -85,6 +88,8 @@ class AlexNet:
                                    ksize=[1, 3, 3, 1],
                                    strides=[1, 2, 2, 1],
                                    padding='VALID')
+
+            print(pool1.shape)
 
         with tf.name_scope('conv2') as scope:
             """
@@ -102,12 +107,14 @@ class AlexNet:
             bias = tf.nn.bias_add(conv, biases)
             conv2 = tf.nn.relu(bias, name=scope)
 
+            print(conv2.shape)
+
         with tf.name_scope('lrn2') as scope:
             lrn2 = tf.nn.lrn(conv2,
                              alpha=2e-5,
                              beta=0.75,
                              depth_radius=2,
-                             bias=2.0)
+                             bias=1.0)
 
         with tf.name_scope('pool2') as scope:
             """
@@ -117,6 +124,8 @@ class AlexNet:
             pool2 = tf.nn.max_pool(lrn2, ksize=[1, 3, 3, 1],
                                    strides=[1, 2, 2, 1],
                                    padding="VALID")
+
+            print(pool2.shape)
 
         with tf.name_scope('conv3') as scope:
             """
@@ -134,6 +143,8 @@ class AlexNet:
             bias = tf.nn.bias_add(conv, biases)
             conv3 = tf.nn.relu(bias, name=scope)
 
+            print(conv3.shape)
+
         with tf.name_scope('conv4') as scope:
             """
             Input size: [?, 13, 13, 384]
@@ -149,6 +160,8 @@ class AlexNet:
 
             bias = tf.nn.bias_add(conv, biases)
             conv4 = tf.nn.relu(bias, name=scope)
+
+            print(conv4.shape)
 
         with tf.name_scope('conv5') as scope:
             """
@@ -166,6 +179,8 @@ class AlexNet:
             bias = tf.nn.bias_add(conv, biases)
             conv5 = tf.nn.relu(bias, name=scope)
 
+            print(conv5.shape)
+
         with tf.name_scope('pool5') as scope:
             """
             Input size: [?, 13, 13, 256]
@@ -175,8 +190,11 @@ class AlexNet:
                                    strides=[1, 2, 2, 1],
                                    padding="VALID")
 
+            print(pool5.shape)
+
         with tf.name_scope('flattened') as scope:
             flattened = tf.reshape(pool5, shape=[-1, 6 * 6 * 256])
+            print(flattened.shape)
 
         with tf.name_scope("fc6") as scope:
             weights = tf.Variable(tf.truncated_normal([6 * 6 * 256, 4096],
@@ -187,6 +205,7 @@ class AlexNet:
                                  trainable=True, name='biases')
             bias = tf.nn.xw_plus_b(flattened, weights, biases)
             fc6 = tf.nn.relu(bias)
+            print(fc6.shape)
 
         with tf.name_scope('dropout6') as scope:
             dropout6 = tf.nn.dropout(fc6, self.keep_prob_placeholder)
@@ -201,6 +220,7 @@ class AlexNet:
                                  trainable=True, name='biases')
             bias = tf.nn.xw_plus_b(dropout6, weights, biases)
             fc7 = tf.nn.relu(bias)
+            print(fc7.shape)
 
         with tf.name_scope('dropout7') as scope:
             dropout7 = tf.nn.dropout(fc7, self.keep_prob_placeholder)
@@ -213,6 +233,37 @@ class AlexNet:
             biases = tf.Variable(tf.constant(0.0, shape=[self.num_classes], dtype=tf.float32),
                                  trainable=True, name='biases')
             self.fc8 = tf.nn.xw_plus_b(dropout7, weights, biases)
+
+    def load_image(self, filename):
+        im = Image.open(filename, 'r')
+
+        if im.mode != "RGB":
+            im = im.convert('RGB')
+
+        imr = im.resize((256, 256), resample=Image.BILINEAR)
+
+        fh_im = BytesIO()
+        imr.save(fh_im, format='JPEG')
+        fh_im.seek(0)
+
+        image = (skimage.img_as_float(skimage.io.imread(fh_im, as_grey=False))
+                        .astype(np.float32))
+
+        H, W, _ = image.shape
+        h, w = (self.height, self.width)
+
+        h_off = max((H - h) // 2, 0)
+        w_off = max((W - w) // 2, 0)
+        image = image[h_off:h_off + h, w_off:w_off + w, :]
+
+        # RGB to BGR
+        image = image[:, :, :: -1]
+
+        image = image.astype(np.float32, copy=False)
+        image = image * 255.0
+        image -= np.array(VGG_MEAN, dtype=np.float32)
+
+        return image.astype(np.int8)
 
     def get_batch(self, batch_size=32, train=True):
         if train:
@@ -228,9 +279,7 @@ class AlexNet:
 
             image_batch = []
             for image in data_batch:
-                _image = io.imread(image)
-                _image = transform.resize(_image, (self.height, self.width, self.channel))
-                image_batch.append(_image)
+                image_batch.append(self.load_image(image))
 
             if image_batch:
                 yield np.array(image_batch), label_batch

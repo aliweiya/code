@@ -11,3 +11,5 @@ im2col_cython.c
 .settings/
 .project
 .idea
+tensorboard/
+*.zip
