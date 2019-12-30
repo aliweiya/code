@@ -13,3 +13,4 @@ im2col_cython.c
 .idea
 tensorboard/
 *.zip
+*.iml
