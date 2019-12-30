@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+                           http://www.springframework.org/schema/beans/spring-beans.xsd
+                           http://www.springframework.org/schema/tx
+                           http://www.springframework.org/schema/tx/spring-tx.xsd
+                           http://www.springframework.org/schema/aop
+                           http://www.springframework.org/schema/aop/spring-aop.xsd
+                           http://www.springframework.org/schema/context
+                           http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <bean id="accountService" class="com.itheima.service.impl.AccountServiceImpl">
+        <property name="accountDao" ref="accountDao"></property>
+    </bean>
+
+    <bean id="accountDao" class="com.itheima.dao.impl.AccountDaoImpl">
+        <property name="dataSource" ref="dataSource"></property>
+    </bean>
+
+    <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+        <property name="driverClassName" value="com.mysql.jdbc.Driver"></property>
+        <property name="url" value="jdbc:mysql://192.168.9.150:3306/eesy"></property>
+        <property name="username" value="root"></property>
+        <property name="password" value="1234qwerty"></property>
+    </bean>
+
+    <!-- 基于xml的声明式事务
+            1. 生命事务管理器
+            2. 导入事务的约束
+            3. 配置aop中的通用切入点表达式
+            4. 建立事务通知和表达式的对应关系
+            5. 配置事务的属性
+    -->
+    <bean  id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"></property>
+    </bean>
+
+    <!-- 配置事务的通知 -->
+    <tx:advice id="txAdvice" transaction-manager="transactionManager">
+        <!-- 配置事务属性
+                rollback-for： 指定一个异常，当产生该异常时事务回滚，其它异常事务不会滚
+                no-rollback-for：当产生该异常时，事务不回滚
+         -->
+        <tx:attributes>
+            <tx:method name="transfer" propagation="REQUIRED" read-only="false"/>
+        </tx:attributes>
+    </tx:advice>
+
+    <!-- 通用切入点表达式 -->
+    <aop:config>
+        <aop:pointcut id="pt1" expression="execution(* com.itheima.service.impl.*.*(..))"></aop:pointcut>
+
+        <aop:advisor advice-ref="txAdvice" pointcut-ref="pt1"></aop:advisor>
+    </aop:config>
+
+</beans>

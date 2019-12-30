@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+                           http://www.springframework.org/schema/beans/spring-beans.xsd
+                           http://www.springframework.org/schema/aop
+                           http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+    <!-- 配置Spring IOC-->
+    <bean id="accountService" class="com.itheima.service.impl.AccountServiceImpl"></bean>
+
+    <!-- 基于xml的配置
+            1. 把通知Bean也交给Spring管理
+            2. 使用 aop:config 标签表明开始AOP的配置
+            3. 使用 aop:aspect 配置切面
+            4. 在aspect标签内部使用对应标签配置通知的类型
+
+                pointcut指出对业务层哪些方法增强
+                - 关键字：execution(表达式)
+                - 表达式：访问修饰符 返回值 包名.类名.方法名(参数列表)
+                - 标准写法：public void com.itheima.service.impl.AccountServiceImpl.saveAccount()
+                - 访问修饰符可以省略
+                - 返回值可以用通配符，表示任意返回值
+                - 包名可以使用通配符表示任意包，但是有几级包就需要写几个*
+                - 可以用 .. 表示当前包及其子包
+                - 类名和方法名都可以实现通配
+                - 参数列表
+                    - 基本类型直接写名称
+                    - 引用类型写报名.类名的方式 java.lang.String
+                    - * 表示任意类型，但是必须有参数
+                    - .. 表示有无参数均可
+                - 全通配写法：* *..*.*(..)
+                - 通常写法：* com.itheima.service.impl.*.*(..)
+     -->
+    <bean id="logger" class="com.itheima.utils.Logger"></bean>
+
+    <aop:config>
+        <aop:aspect id="logAdvice" ref="logger">
+            <!-- 指定表达式唯一标识，写入aop:aspect的化只能当前切面使用，写在外面所有的都可以使用 -->
+            <aop:pointcut id="pt1" expression="execution(public void com.itheima.service.impl.AccountServiceImpl.saveAccount())"></aop:pointcut>
+            <!-- 前置通知 -->
+            <aop:before method="beforePrintLog" pointcut="execution(public void com.itheima.service.impl.AccountServiceImpl.saveAccount())"></aop:before>
+            <!-- 后置通知 -->
+            <aop:after-returning method="afterReturningPrintLog" pointcut="execution(public void com.itheima.service.impl.AccountServiceImpl.saveAccount())"></aop:after-returning>
+            <!-- 异常通知 -->
+            <aop:after-throwing method="afterThrowingPrintLog" pointcut="execution(public void com.itheima.service.impl.AccountServiceImpl.saveAccount())"></aop:after-throwing>
+            <!-- 最终通知 -->
+            <aop:after method="afterPrintLog" pointcut-ref="pt1"></aop:after>
+
+            <!-- 环绕通知 -->
+            <aop:around method="aroundPrintLog" pointcut-ref="pt1"></aop:around>
+        </aop:aspect>
+    </aop:config>
+</beans>
