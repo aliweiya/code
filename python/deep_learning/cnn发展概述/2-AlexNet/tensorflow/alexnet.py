@@ -11,27 +11,32 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import OneHotEncoder  
 from sklearn.utils import shuffle
 
+from tensorflow.contrib.layers import xavier_initializer
+
 import tensorflow as tf
 
 VGG_MEAN = [104, 117, 123]
 
 class AlexNet:
-    """
-    https://blog.csdn.net/qq_26499769/article/details/82928178
-    """
 
     def __init__(self, height, width, channel, num_classes, dataset_path):
-        self.keep_prob = 0.7
+        self.keep_prob = 0.5
         self.filewriter_path = 'tensorboard'
         self.ckpt_path = 'ckpt/alexnet.ckpt'
-        self.learning_rate = 0.00146
-        self.epochs = 10
+        self.learning_rate = 3e-5
+        self.epochs = 100
         self.dataset_path = dataset_path
 
         self.height = height
         self.width = width
         self.channel = channel
         self.num_classes = num_classes
+
+        # L2 正则化
+        # lambda * W^2
+        # 可以使得W的每个元素都很小，都接近于0，但与L1范数不同，它不会让它等于0，而是接近于0
+        # 而越小的参数说明模型越简单，越简单的模型则越不容易产生过拟合现象。
+        self.l2_regularizer=tf.contrib.layers.l2_regularizer(0.1) 
 
         self.x = tf.placeholder(tf.float32, [None, height, width, channel], name='x')
         self.y_ = tf.placeholder(tf.int32, [None, num_classes], name='y')
@@ -41,6 +46,8 @@ class AlexNet:
         self.sess = tf.Session(graph=graph)
 
         self.build()
+
+        self.saver = tf.train.Saver()
 
     def build(self):
         with tf.name_scope("conv1") as scope:
@@ -56,10 +63,12 @@ class AlexNet:
             = [?, 57, 57, 96]
             """
             # [kernel_height, kernel_width, channel_in, channel_out]
-            kernel = tf.Variable(tf.truncated_normal([11, 11, 3, 96],
-                                                      mean=0,
-                                                      stddev=0.1,
-                                                      dtype=tf.float32), name="weights")
+            # kernel = tf.Variable(tf.truncated_normal([11, 11, 3, 96],
+            #                                           mean=0,
+            #                                           stddev=0.1,
+            #                                           dtype=tf.float32), name="weights")
+            kernel = tf.get_variable(name='weights1', shape=[11, 11, 3, 96], dtype=tf.float32,
+                                     initializer=xavier_initializer(), regularizer=self.l2_regularizer)
             # SAME: padding with inf, VALID: no padding
             # batch, height, width, channel
             conv = tf.nn.conv2d(self.x, kernel, [1, 4, 4, 1], padding="VALID")
@@ -96,10 +105,12 @@ class AlexNet:
             Input size: [?, 28, 28, 96]
             Output size: [?, (28 + 4 - 5) / 1 + 1, (28 + 4 - 5) / 1 + 1, 256] = [?, 28, 28, 256]
             """
-            kernel = tf.Variable(tf.truncated_normal([5, 5, 96, 256],
-                                                     dtype=tf.float32,
-                                                     mean=0,
-                                                     stddev=1e-1), name='weights')
+            # kernel = tf.Variable(tf.truncated_normal([5, 5, 96, 256],
+            #                                          dtype=tf.float32,
+            #                                          mean=0,
+            #                                          stddev=1e-1), name='weights')
+            kernel = tf.get_variable(name='weights2', shape=[5, 5, 96, 256], dtype=tf.float32,
+                                     initializer=xavier_initializer(), regularizer=self.l2_regularizer)
             conv = tf.nn.conv2d(pool1, kernel, [1, 1, 1, 1], padding="SAME")
             biases = tf.Variable(tf.constant(0.0, shape=[256], dtype=tf.float32),
                                  trainable=True, name='biases')
@@ -132,10 +143,12 @@ class AlexNet:
             Input size: [?, 13, 13, 256]
             Outpuy size: [?, 13, 13, 384]
             """
-            kernel = tf.Variable(tf.truncated_normal([3, 3, 256, 384],
-                                                     dtype=tf.float32,
-                                                     mean=0,
-                                                     stddev=1e-1), name='weights')
+            # kernel = tf.Variable(tf.truncated_normal([3, 3, 256, 384],
+            #                                          dtype=tf.float32,
+            #                                          mean=0,
+            #                                          stddev=1e-1), name='weights')
+            kernel = tf.get_variable(name='weights3', shape=[3, 3, 256, 384], dtype=tf.float32,
+                                     initializer=xavier_initializer(), regularizer=self.l2_regularizer)
             conv = tf.nn.conv2d(pool2, kernel, [1, 1, 1, 1], padding="SAME")
             biases = tf.Variable(tf.constant(0.0, shape=[384], dtype=tf.float32),
                                  trainable=True, name='biases')
@@ -150,10 +163,12 @@ class AlexNet:
             Input size: [?, 13, 13, 384]
             Output size: [?, 13, 13, 384]
             """
-            kernel = tf.Variable(tf.truncated_normal([3, 3, 384, 384],
-                                                     dtype=tf.float32,
-                                                     mean=0,
-                                                     stddev=1e-1), name='weights')
+            # kernel = tf.Variable(tf.truncated_normal([3, 3, 384, 384],
+            #                                          dtype=tf.float32,
+            #                                          mean=0,
+            #                                          stddev=1e-1), name='weights')
+            kernel = tf.get_variable(name='weights4', shape=[3, 3, 384, 384], dtype=tf.float32,
+                                     initializer=xavier_initializer(), regularizer=self.l2_regularizer)
             conv = tf.nn.conv2d(conv3, kernel, [1, 1, 1, 1], padding="SAME")
             biases = tf.Variable(tf.constant(0.0, shape=[384], dtype=tf.float32),
                                  trainable=True, name='biases')
@@ -168,10 +183,12 @@ class AlexNet:
             Input size: [?, 13, 13, 384]
             Output size: [?, 13, 13, 256]
             """
-            kernel = tf.Variable(tf.truncated_normal([3, 3, 384, 256],
-                                                     dtype=tf.float32,
-                                                     mean=0,
-                                                     stddev=1e-1), name='weights')
+            # kernel = tf.Variable(tf.truncated_normal([3, 3, 384, 256],
+            #                                          dtype=tf.float32,
+            #                                          mean=0,
+            #                                          stddev=1e-1), name='weights')
+            kernel = tf.get_variable(name='weights5', shape=[3, 3, 384, 256], dtype=tf.float32,
+                                     initializer=xavier_initializer(), regularizer=self.l2_regularizer)
             conv = tf.nn.conv2d(conv4, kernel, [1, 1, 1, 1], padding="SAME")
             biases = tf.Variable(tf.constant(0.0, shape=[256], dtype=tf.float32),
                                  trainable=True, name='biases')
@@ -197,13 +214,15 @@ class AlexNet:
             print(flattened.shape)
 
         with tf.name_scope("fc6") as scope:
-            weights = tf.Variable(tf.truncated_normal([6 * 6 * 256, 4096],
-                                                      dtype=tf.float32,
-                                                      mean=0,
-                                                      stddev=1e-1), name='weights')
+            # weights = tf.Variable(tf.truncated_normal([6 * 6 * 256, 4096],
+            #                                           dtype=tf.float32,
+            #                                           mean=0,
+            #                                           stddev=1e-1), name='weights')
+            kernel = tf.get_variable(name='weights6', shape=[6 * 6 * 256, 4096], dtype=tf.float32,
+                                     initializer=xavier_initializer(), regularizer=self.l2_regularizer)
             biases = tf.Variable(tf.constant(0.0, shape=[4096], dtype=tf.float32),
                                  trainable=True, name='biases')
-            bias = tf.nn.xw_plus_b(flattened, weights, biases)
+            bias = tf.nn.xw_plus_b(flattened, kernel, biases)
             fc6 = tf.nn.relu(bias)
             print(fc6.shape)
 
@@ -211,14 +230,16 @@ class AlexNet:
             dropout6 = tf.nn.dropout(fc6, self.keep_prob_placeholder)
 
         with tf.name_scope('fc7') as scope:
-            weights = tf.Variable(tf.truncated_normal([4096, 4096],
-                                                      dtype=tf.float32,
-                                                      mean=0,
-                                                      stddev=1e-1), name='weights')
+            # weights = tf.Variable(tf.truncated_normal([4096, 4096],
+            #                                           dtype=tf.float32,
+            #                                           mean=0,
+            #                                           stddev=1e-1), name='weights')
 
+            kernel = tf.get_variable(name='weights7', shape=[4096, 4096], dtype=tf.float32,
+                                     initializer=xavier_initializer(), regularizer=self.l2_regularizer)
             biases = tf.Variable(tf.constant(0.0, shape=[4096], dtype=tf.float32),
                                  trainable=True, name='biases')
-            bias = tf.nn.xw_plus_b(dropout6, weights, biases)
+            bias = tf.nn.xw_plus_b(dropout6, kernel, biases)
             fc7 = tf.nn.relu(bias)
             print(fc7.shape)
 
@@ -226,13 +247,16 @@ class AlexNet:
             dropout7 = tf.nn.dropout(fc7, self.keep_prob_placeholder)
 
         with tf.name_scope('fc8') as scope:
-            weights = tf.Variable(tf.truncated_normal([4096, self.num_classes],
-                                                      dtype=tf.float32,
-                                                      mean=0,
-                                                      stddev=1e-1), name='weights')
+            # weights = tf.Variable(tf.truncated_normal([4096, self.num_classes],
+            #                                           dtype=tf.float32,
+            #                                           mean=0,
+            #                                           stddev=1e-1), name='weights')
+            kernel = tf.get_variable(name='weights8', shape=[4096, self.num_classes], dtype=tf.float32,
+                                     initializer=xavier_initializer(), regularizer=self.l2_regularizer)
             biases = tf.Variable(tf.constant(0.0, shape=[self.num_classes], dtype=tf.float32),
                                  trainable=True, name='biases')
-            self.fc8 = tf.nn.xw_plus_b(dropout7, weights, biases)
+            self.fc8 = tf.nn.xw_plus_b(dropout7, kernel, biases)
+            print(self.fc8.name)
 
     def load_image(self, filename):
         im = Image.open(filename, 'r')
@@ -323,8 +347,6 @@ class AlexNet:
         merged_summary = tf.summary.merge_all()
         writer = tf.summary.FileWriter(self.filewriter_path, self.sess.graph)
 
-        saver = tf.train.Saver()
-
         self.sess.run(tf.global_variables_initializer())
 
         total_batch = 0
@@ -347,7 +369,7 @@ class AlexNet:
                 total_acc += _acc
 
             print('Test loss: {}, acc: {}'.format(total_loss / (batch + 1), total_acc / (batch + 1)))
-            saver.save(self.sess, self.ckpt_path, global_step=epoch)
+            self.saver.save(self.sess, self.ckpt_path, global_step=epoch)
 
     def predict(self, data):
         y = self.sess.run(self.outputs, feed_dict={self.x: data})
