@@ -34,6 +34,7 @@ class AlexNet(nn.Module):
   
   def forward(self, inputs):
     inputs = self.features(inputs)
+    import pdb;pdb.set_trace()
     inputs = inputs.view(-1, 256 * 1 * 1)
     inputs = self.classifier(inputs)
     return F.log_softmax(inputs, dim=1)
