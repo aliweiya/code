@@ -9,6 +9,8 @@ import MySQLdb
 conn=MySQLdb.connect(host="localhost", port=3306, user="test", passwd="test", db="test", charset="utf8") 
 
 cursor = conn.cursor()
+cursor.execute("select count(1) from user_baseinfo where mobile REGEXP '^[1][35678][0-9]{9}$'")
+cursor.fetchall()
 
 # ---------------------------------------------------------
 # mongo
