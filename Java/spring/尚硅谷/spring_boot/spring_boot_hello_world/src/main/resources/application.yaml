@@ -1,0 +1,27 @@
+person:
+  lastName: hello
+  age: 18
+  boss: false
+  birth: 2017/12/12
+  maps: {k1: v1, k2: v2}
+  lists:
+    - lisi
+    - zhaoliu
+  dog:
+    name: 小狗
+    age: 2
+
+spring:
+  profiles: test
+server:
+  port: 8081
+---
+spring:
+  profiles: dev
+server:
+  port: 8082
+---
+spring:
+  profiles: prod
+server:
+  port: 8083

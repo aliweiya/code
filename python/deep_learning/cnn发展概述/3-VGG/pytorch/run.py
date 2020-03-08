@@ -8,16 +8,19 @@ from torchvision.datasets.cifar import CIFAR10
 import torchvision.transforms as transforms
 from torch.utils.data import DataLoader
 
+# dataset_path = 'D:\\personal\\dataset\\cifar'
 dataset_path = '/root/M/datasets/cifar10'
 
 data_train = CIFAR10(dataset_path,
                    download=True,
                    transform=transforms.Compose([
-                       transforms.RandomHorizontalFlip(), # data augmentation: random horizontal flip
-                       transforms.Resize((224,224)),
-                       transforms.ToTensor(),
-                       # 数据归一化处理，调用前数据需处理成Tensor
-                       transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])]))
+                        transforms.RandomHorizontalFlip(), # data augmentation: random horizontal flip
+                        # transforms.Resize((224,224)),
+                        transforms.RandomResizedCrop(224),
+                        transforms.ToTensor(),
+                        # 数据归一化处理，调用前数据需处理成Tensor
+                        transforms.Normalize(mean=[0.485, 0.456, 0.406],
+                                             std=[0.229, 0.224, 0.225])]))
 data_test = CIFAR10(dataset_path,
                   train=False,
                   download=True,
@@ -30,7 +33,7 @@ data_test_loader = DataLoader(data_test, batch_size=32, num_workers=1)
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-net = VGG16(device)
+net = VGG16(device, 10)
 net.to(device)
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.Adam(net.parameters(), lr=1e-5)
@@ -41,8 +44,6 @@ def train(epoch):
     loss_list, batch_list = [], []
     tic = time.time()
     for i, (images, labels) in enumerate(data_train_loader):
-        optimizer.zero_grad()
-
         output = net(images)
 
         loss = criterion(output, labels.to(device))
@@ -54,6 +55,8 @@ def train(epoch):
         print('Train - Epoch %d, Batch: %d, Loss: %f, time: %f' % (epoch, i, loss.detach().cpu().item(), toc-tic))
         tic = time.time()
 
+        
+        optimizer.zero_grad()
         # 这里需要在GPU上计算，所以loss不能转CPU
         loss.backward()
         optimizer.step()

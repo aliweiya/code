@@ -1,9 +1,9 @@
 package com.turtle.spark.imooc_log_analysis
 
 import com.ggstar.util.ip.IpHelper
-import org.apache.spark.sql.Row
 import org.apache.spark.sql.types.{IntegerType, StringType, StructField, StructType}
 import org.apache.spark.{SparkConf, SparkContext};
+
 
 object SparkStatFormatJob {
 

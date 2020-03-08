@@ -1,8 +1,8 @@
 *.pyc
 *.db
 **/venv/
-target
-build
+target/
+build/
 *.pyd
 im2col_cython.c
 .vscode

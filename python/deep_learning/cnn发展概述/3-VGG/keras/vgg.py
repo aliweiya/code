@@ -88,7 +88,6 @@ class VGG16:
         model.add(Dense(4096, kernel_regularizer=l2(reg)))
         model.add(Dense(4096, kernel_regularizer=l2(reg)))
         model.add(Dropout(0.5))
-        model.add(Dense(1000, kernel_regularizer=l2(reg)))
 
         model.add(Dense(classes, kernel_regularizer=l2(reg)))
         model.add(Activation("softmax"))
