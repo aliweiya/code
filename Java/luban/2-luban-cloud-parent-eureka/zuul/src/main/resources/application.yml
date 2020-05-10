@@ -1,0 +1,25 @@
+server:
+  port: 7777
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:3000/eureka/
+  instance:
+    instance-id: power
+    prefer-ip-address: true
+    lease-expiration-duration-in-seconds: 10
+    lease-renewal-interval-in-seconds: 10
+
+spring:
+  application:
+    name: zuul
+
+zuul:
+  routes:
+    # 定义了这个，就不能通过微服务名字访问
+    ignored-services: server-power
+    # 自定义路由名称，定义了这个就可以不用eureka中的name了，直接用url
+    mypower:
+      serviceId: server-power
+      # /* 当前一层， /**所有层
+      path: /power/**
