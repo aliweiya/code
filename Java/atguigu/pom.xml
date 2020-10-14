@@ -26,6 +26,12 @@
         <module>15-cloud-alibaba-provider-payment9001</module>
         <module>16-cloud-alibaba-consumer-nacos-order83</module>
         <module>17-cloud-alibaba-nacos-config-client3377</module>
+<<<<<<< HEAD
+=======
+        <module>18-cloud-alibaba-sentinel-service8401</module>
+        <module>19-cloud-alibaba-provider-payment9003</module>
+        <module>19-cloud-alibaba-consumer-feign-order84</module>
+>>>>>>> 8dbe16465b9d45ed50b4efac9ca79a777ba0f2f2
     </modules>
     <packaging>pom</packaging>
 
