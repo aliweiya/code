@@ -1,0 +1,14 @@
+/* 首页 */
+.main {
+    width: 980px;
+    height: 455px;
+    background-color: pink;
+    margin-left: 220px;
+}
+
+.focus {
+    width: 721px;
+    height: 455px;
+    float: left;
+    background-color: purple;
+}
