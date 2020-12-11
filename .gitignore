@@ -43,3 +43,12 @@ pnpm-debug.log*
 *.sw?
 
 package-lock.json
+
+test
+
+Debug/
+
+.vs/
+.vcxproj
+.vcxproj.filters
+.vcxproj.user

@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <style>
+            #grad {
+                width: 100px;
+                height: 100px;
+                margin: 0 auto;
+                background-image: linear-gradient(#e66465, #9198e5);
+            }
+        </style>
+    </head>
+    <body>
+        <input type="text" id="degree">
+        <button onclick="clickButton()">旋转</button>
+        <div id="grad"></div>
+
+        <script>
+            function clickButton() {
+                let degree = document.getElementById('degree').value;
+                document.getElementById("grad").style.WebkitTransform=`rotate(${degree}deg)`;
+            }
+        </script>
+    </body>
+</html>
